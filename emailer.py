@@ -9,8 +9,11 @@ import yagmail
 
 def send_daily():
     with yagmail.SMTP(p_conf.USERNAME, p_conf.PASSWORD) as sender:
-        params = {}
-        params["to"] = p_conf.TO_LIST
+        params             = {}
+        params["to"]       = p_conf.TO_LIST
+        params["subject"]  = "Hello There"
+        params["contents"] = ["General Kenobi"]
+        params["attachments"]  = ['./test.csv']
         sender.send(**params)
 
 if __name__ == "__main__":
