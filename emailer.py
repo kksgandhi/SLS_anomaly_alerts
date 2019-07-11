@@ -6,14 +6,17 @@ except ModuleNotFoundError:
     print("DO NOT ADD YOUR PRIVATE_CONFIG TO VERSION CONTROL")
 import config as conf
 import yagmail
+from yagmail import inline
+from datetime import date
 
 def send_daily():
     with yagmail.SMTP(p_conf.USERNAME, p_conf.PASSWORD) as sender:
-        params             = {}
-        params["to"]       = p_conf.TO_LIST
-        params["subject"]  = "Hello There"
-        params["contents"] = ["General Kenobi"]
-        params["attachments"]  = ['./test.csv']
+        params                = {}
+        params["to"]          = p_conf.TO_LIST
+        params["subject"]     = f"{date.today()} anomaly updates"
+        params["contents"]    = ["General Kenobi",
+                                 inline('./lava.jpg')]
+        params["attachments"] = ['./test.csv']
         sender.send(**params)
 
 if __name__ == "__main__":
