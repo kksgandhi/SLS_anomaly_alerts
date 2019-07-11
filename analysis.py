@@ -11,9 +11,6 @@ import datetime
 from pprint import pprint as print
 from scipy.interpolate import interp1d
 import api_scraper as scraper
-api_data = scraper.get_sensors_with_obs_type()
-sensors  = pd.DataFrame(api_data)
-sensors.head()
 
 def get_sls_data(sensor, start_date, end_date):
     link      = sensor["link"]
@@ -41,19 +38,29 @@ def get_train(sensor, **kwargs):
     train = get_sls_data(sensor, start_date_train, end_date_train)
     return train, start_date_train
 
-
 def get_test(sensor, **kwargs):
     date = (date_parser.parse(kwargs["date"])
             if "date" in kwargs
             else datetime.datetime.utcnow())
 
     test_delta   = kwargs.get("test_delta" , 1)
-    n_days_test  = datetime.timedelta(days=test_delta)
+    if test_delta >= 1:
+        n_days_test  = datetime.timedelta(days=test_delta)
 
-    start_date_test  = str(date - n_days_test)
-    end_date_test    = str(date)
-    test  = get_sls_data(sensor, start_date_test , end_date_test)
-    return test, end_date_test
+        start_date_test  = str(date - n_days_test)
+        end_date_test    = str(date)
+        test  = get_sls_data(sensor, start_date_test , end_date_test)
+        return test, end_date_test
+    else:
+        def aaa(x):
+            delta = datetime.timedelta(days=(1-x*test_delta))
+            n_days_test  = datetime.timedelta(days=test_delta)
+            start_date_test  = str(date - n_days_test - delta)
+            end_date_test    = str(date - delta)
+            test  = get_sls_data(sensor, start_date_test , end_date_test)
+            return test
+        tests = list(map(aaa, range(int(1 / test_delta))))
+        return tests, str(date)
 
 def clean_noaa(start_date, end_date):
     YSHIFT_GUESS = 0.5
@@ -93,6 +100,8 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
     scale_factor   = kwargs.get("scale_factor"  , 1000)
     aggregator     = kwargs.get("aggregator"    , np.mean)
     test_data      = kwargs.get("test_delta"    , 1)
+    if type(data) == 'list':
+        return max(map(lambda x: calculate_residuals(x, params, ftp_function, **kwargs), data))
     try:
         xdata = data["timestamp"].apply(mdates.date2num)
         estimated_y = ftp_function(xdata, *params)
@@ -115,10 +124,10 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
 #defaults to current day as the test day 
 def full_sensor_test(sensor, **kwargs):
     
-    test_all = []
+    test_all     = []
     test_res_all = []
-    ends = []
-    num_pts_day = 0
+    ends         = []
+    num_pts_day  = 0
     try:
         sensor_name = sensor["desc"]
         
@@ -157,3 +166,8 @@ def daily_test():
     sensors["num_test_vals"]        = residuals.apply(lambda res: res[2]    if res else None)
     sensors = sensors.sort_values("num_test_vals", ascending=False)  
     return sensors
+
+if __name__ == "__main__":
+    test_output = daily_test()
+    test_output.to_csv('./test_output.csv')
+    print(test_output)
