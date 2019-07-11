@@ -44,23 +44,12 @@ def get_test(sensor, **kwargs):
             else datetime.datetime.utcnow())
 
     test_delta   = kwargs.get("test_delta" , 1)
-    if test_delta >= 1:
-        n_days_test  = datetime.timedelta(days=test_delta)
+    n_days_test  = datetime.timedelta(days=test_delta)
 
-        start_date_test  = str(date - n_days_test)
-        end_date_test    = str(date)
-        test  = get_sls_data(sensor, start_date_test , end_date_test)
-        return test, end_date_test
-    else:
-        def aaa(x):
-            delta = datetime.timedelta(days=(1-x*test_delta))
-            n_days_test  = datetime.timedelta(days=test_delta)
-            start_date_test  = str(date - n_days_test - delta)
-            end_date_test    = str(date - delta)
-            test  = get_sls_data(sensor, start_date_test , end_date_test)
-            return test
-        tests = list(map(aaa, range(int(1 / test_delta))))
-        return tests, str(date)
+    start_date_test  = str(date - n_days_test)
+    end_date_test    = str(date)
+    test  = get_sls_data(sensor, start_date_test , end_date_test)
+    return test, end_date_test
 
 def clean_noaa(start_date, end_date):
     YSHIFT_GUESS = 0.5
@@ -100,8 +89,6 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
     scale_factor   = kwargs.get("scale_factor"  , 1000)
     aggregator     = kwargs.get("aggregator"    , np.mean)
     test_data      = kwargs.get("test_delta"    , 1)
-    if type(data) == 'list':
-        return max(map(lambda x: calculate_residuals(x, params, ftp_function, **kwargs), data))
     try:
         xdata = data["timestamp"].apply(mdates.date2num)
         estimated_y = ftp_function(xdata, *params)
