@@ -8,9 +8,10 @@ import config as conf
 import yagmail
 
 def send_daily():
-    sender = yagmail.SMTP(p_conf.USERNAME,
-                          p_conf.PASSWORD)
-    sender.send()
+    with yagmail.SMTP(p_conf.USERNAME, p_conf.PASSWORD) as sender:
+        params = {}
+        params["to"] = p_conf.TO_LIST
+        sender.send(**params)
 
 if __name__ == "__main__":
     send_daily()
