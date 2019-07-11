@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # import packages
-
-# In[1]:
-
-
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from scipy import optimize
@@ -18,30 +10,10 @@ import dateutil.parser as date_parser
 import datetime
 from pprint import pprint as print
 from scipy.interpolate import interp1d
-
-
-# # Get data from SLS API
-
-# In[2]:
-
-
-import api_scraper_updated
-api_data = api_scraper_updated.get_sensors_with_obs_type()
+import api_scraper as scraper
+api_data = scraper.get_sensors_with_obs_type()
 sensors  = pd.DataFrame(api_data)
-
-
-# In[ ]:
-
-
 sensors.head()
-
-
-# # Get SLS data functions
-
-# ### convert sls data into useable format
-
-# In[3]:
-
 
 def get_sls_data(sensor, start_date, end_date):
     link      = sensor["link"]
@@ -49,18 +21,12 @@ def get_sls_data(sensor, start_date, end_date):
     #print(link)
     #print(start_date)
     #print(end_date)
-    data      = api_scraper_updated.get_obs_for_link(link, start_date, end_date)
+    data      = scraper.get_obs_for_link(link, start_date, end_date)
     #print(data)
     data      = pd.DataFrame(data, columns= ["value", "timestamp"])
     #data      = data.sort_values(by = ['timestamp'])
     data["adj_value"] = data["value"].map(lambda value: float(elevation) + float(value))
     return data
-
-
-# ### get train and test set
-
-# In[12]:
-
 
 def get_train(sensor, **kwargs):
     date = (date_parser.parse(kwargs["date"])
@@ -89,15 +55,9 @@ def get_test(sensor, **kwargs):
     test  = get_sls_data(sensor, start_date_test , end_date_test)
     return test, end_date_test
 
-
-# # Get NOAA data functions
-
-# In[9]:
-
-
 def clean_noaa(start_date, end_date):
     YSHIFT_GUESS = 0.5
-    data              = api_scraper_updated.get_ft_pulaski(start_date, end_date)
+    data              = scraper.get_ft_pulaski(start_date, end_date)
     data              = pd.DataFrame(data)
     data["adj_v"]     = data["v"].apply(lambda x: float(x) - YSHIFT_GUESS)
     data["timestamp"] = data["t"].apply(date_parser.parse) 
@@ -118,14 +78,6 @@ def get_ftp_function(train_start, test_end):
         return ((inter_val) + yshift)
 
     return noaa_function
-
-
-# # Calculate offsets
-
-# ### Curve fitting + residuals calculation
-
-# In[27]:
-
 
 def fit_curve(sls_data, ftp_function, **kwargs):
     #curve_equation = kwargs.get("curve_equation", noaa_function)
@@ -195,80 +147,13 @@ def full_sensor_test(sensor, **kwargs):
         return None
 
 def daily_test():    
-    api_data = api_scraper_updated.get_sensors_with_obs_type()
-    sensors  = pd.DataFrame(api_data)
+    api_data  = scraper.get_sensors_with_obs_type()
+    sensors   = pd.DataFrame(api_data)
     residuals = sensors.apply(full_sensor_test, axis=1, test_delta_array = [1/24, 1, 3])
-    sensors["train_residuals"] = residuals.apply(lambda res: res[0] if res else None)
-    sensors["test_residuals_1hour"]  = residuals.apply(lambda res: res[1][0] if res else None)
+    sensors["train_residuals"]      = residuals.apply(lambda res: res[0]    if res else None)
+    sensors["test_residuals_1hour"] = residuals.apply(lambda res: res[1][0] if res else None)
     sensors["test_residuals_1day"]  = residuals.apply(lambda res: res[1][1] if res else None)
-    sensors["test_residuals_3days"]  = residuals.apply(lambda res: res[1][2] if res else None)
-    sensors["num_test_vals"] = residuals.apply(lambda res: res[2] if res else None)
+    sensors["test_residuals_3days"] = residuals.apply(lambda res: res[1][2] if res else None)
+    sensors["num_test_vals"]        = residuals.apply(lambda res: res[2]    if res else None)
     sensors = sensors.sort_values("num_test_vals", ascending=False)  
     return sensors
-    
-#initial parameters matter in cases where the pulaski noaa data doesn't quite match close enough to the data
-#really high training residual values when there are outliers/bad readings 
-#really low residuals for sparse points - misleading 
-
-
-# In[31]:
-
-
-
-
-
-# # Residuals for all sensors 
-
-# In[ ]:
-
-
-residuals = sensors.apply(full_test, axis=1, aggregator=np.mean, test_delta_array = [1])
-sensors["train_residuals"] = residuals.apply(lambda res: res[0] if res else None)
-
-
-# In[ ]:
-
-
-sensors["test_residuals_day"]  = residuals.apply(lambda res: res[1][0] if res else None)
-#sensors["test_residuals_hour"]  = residuals.apply(lambda res: res[1][0] if res else None)
-#sensors["test_residuals_3days"]  = residuals.apply(lambda res: res[1][2] if res else None)
-sensors.sort_values("test_residuals_day", ascending=False)
-
-
-# ## sample test 
-
-# In[ ]:
-
-
-sensors
-
-
-# In[14]:
-
-
-daily_test()
-
-
-# In[38]:
-
-
-#amplitude adjustment?
-#pre-check?
-
-#Sapelo Island Ferry Dock Sea Level
-#Sensor - 1 hour time frame for test data 
-#Turner Creek Boat Ramp Sea Level Sensor - July 1
-#Rose Dhu Island Sea Level Sensor - July 2
-#Hwy 21 at St Augustine Creek Level Sensor - June 14 
-#normal: Faye Drive on Burnside Island Sea Level Sensor - July 1
-
-sensor = sensors.loc[1]
-print(sensor)
-full_sensor_test(sensor, verbose=True, test_delta_array = [2/24, 1, 3], train_delta=7)
-
-
-# In[ ]:
-
-
-
-
