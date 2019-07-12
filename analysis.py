@@ -169,6 +169,7 @@ def daily_test():
     sensors["test_residuals_3days"] = residuals.apply(lambda res: res[1][2] if res else None)
     sensors["num_test_vals"]        = residuals.apply(lambda res: res[2]    if res else None)
     sensors = sensors.sort_values("num_test_vals", ascending=False)  
+    sensors["run_date"] = datetime.datetime.utcnow()
     return sensors
 
 if __name__ == "__main__":
