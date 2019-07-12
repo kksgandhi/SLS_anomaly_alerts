@@ -11,6 +11,9 @@ import datetime
 from pprint import pprint as print
 from scipy.interpolate import interp1d
 import api_scraper as scraper
+import config as conf
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 def get_sls_data(sensor, start_date, end_date):
     link      = sensor["link"]
@@ -121,6 +124,8 @@ def plot(data, params, ftp_function, **kwargs):
     xdata = kwargs.get("xdata", data["timestamp"].apply(mdates.date2num))
     estimated_y = kwargs.get("estimated_y", ftp_function(xdata, *params))
     verbose = kwargs.get("verbose", False)
+    save_plots = kwargs.get("save_plots", False)
+    plot_name = kwargs.get("plot_name", "")
     plt.figure(figsize=(30, 20))
     plt.grid(b=True)
     plt.xlabel('Time', fontsize=20, labelpad=10)
@@ -128,8 +133,12 @@ def plot(data, params, ftp_function, **kwargs):
     plt.scatter(data["timestamp"], data["adj_value"], color = "red", label='Sensor Data')
     plt.plot(data["timestamp"], estimated_y, label='Fort Pulaski (fitted, not original)', color="green", linewidth=1)
     plt.legend(loc='best', fontsize =16)
-    if verbose:
+    if save_plots:
+        plt.title(plot_name, fontdict={'fontsize':36})
+        plt.savefig(plot_name + ".png", bbox_inches='tight')
+    elif verbose:
         plt.show()
+    plt.close()
 
 #defaults to current day as the test day 
 def full_sensor_test(sensor, **kwargs):
@@ -138,7 +147,8 @@ def full_sensor_test(sensor, **kwargs):
     test_res_all = []
     ends         = []
     num_pts_day  = 0
-    test_delta_array = kwargs.get("test_delta_array", [1,3,1/24])
+    test_delta_array = kwargs.get("test_delta_array", [1/24, 1, 3])
+    save_plots = kwargs.get("save_plots", False)
     try:
         sensor_name = sensor["desc"]
         
@@ -158,6 +168,11 @@ def full_sensor_test(sensor, **kwargs):
         params = fit_curve(train, ftp_function, **kwargs)
         train_residuals = calculate_residuals(train, params, ftp_function, **kwargs)    
         test_res_all = list(map(lambda curr_test: calculate_residuals(curr_test, params, ftp_function, **kwargs), test_all))
+        if save_plots and (test_res_all[0] > conf.ONE_HOUR_THRESHOLD or
+                           test_res_all[1] > conf.ONE_DAY_THRESHOLD or
+                           test_res_all[2] > conf.THREE_DAYS_THRESHOLD or
+                           num_pts_day < conf.MIN_VALUES_PER_DAY):
+            plot(test_all[2], params, ftp_function, plot_name=sensor_name,**kwargs)
         print("Success: " + sensor_name)
         return train_residuals, test_res_all, num_pts_day
     except Exception as e:
@@ -169,7 +184,7 @@ def full_sensor_test(sensor, **kwargs):
 def daily_test():    
     api_data  = scraper.get_sensors_with_obs_type()
     sensors   = pd.DataFrame(api_data)
-    residuals = sensors.apply(full_sensor_test, axis=1, test_delta_array = [1/24, 1, 3])
+    residuals = sensors.apply(full_sensor_test, axis=1, test_delta_array = [1/24, 1, 3], save_plots=True)
     sensors["train_residuals"]      = residuals.apply(lambda res: res[0]    if res else None)
     sensors["test_residuals_1hour"] = residuals.apply(lambda res: res[1][0] if res else None)
     sensors["test_residuals_1day"]  = residuals.apply(lambda res: res[1][1] if res else None)
