@@ -119,7 +119,9 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
         squared_residuals = (estimated_y - data["adj_value"]) ** 2
 
         return aggregator(squared_residuals) * scale_factor
-    except:
+    except Exception as e:
+        if verbose:
+            raise e
         return None
 
 #defaults to current day as the test day 
