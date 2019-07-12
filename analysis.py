@@ -107,14 +107,7 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
         estimated_y = ftp_function(xdata, *params)
 
         if verbose:
-            plt.figure(figsize=(30, 20))
-            plt.grid(b=True)
-            plt.xlabel('Time', fontsize=20, labelpad=10)
-            plt.ylabel('Water Level (m)', fontsize=20)
-            plt.scatter(data["timestamp"], data["adj_value"], color = "red", label='Sensor Data')
-            plt.plot(data["timestamp"], estimated_y, label='Fort Pulaski (fitted, not original)', color="green", linewidth=1)
-            plt.legend(loc='best', fontsize =16)
-            plt.show()
+            plot(data, params, ftp_function,xdata=xdata, estimated_y=estimated_y, **kwargs)
 
         squared_residuals = (estimated_y - data["adj_value"]) ** 2
 
@@ -123,6 +116,20 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
         if verbose:
             raise e
         return None
+
+def plot(data, params, ftp_function, **kwargs):
+    xdata = kwargs.get("xdata", data["timestamp"].apply(mdates.date2num))
+    estimated_y = kwargs.get("estimated_y", ftp_function(xdata, *params))
+    verbose = kwargs.get("verbose", False)
+    plt.figure(figsize=(30, 20))
+    plt.grid(b=True)
+    plt.xlabel('Time', fontsize=20, labelpad=10)
+    plt.ylabel('Water Level (m)', fontsize=20)
+    plt.scatter(data["timestamp"], data["adj_value"], color = "red", label='Sensor Data')
+    plt.plot(data["timestamp"], estimated_y, label='Fort Pulaski (fitted, not original)', color="green", linewidth=1)
+    plt.legend(loc='best', fontsize =16)
+    if verbose:
+        plt.show()
 
 #defaults to current day as the test day 
 def full_sensor_test(sensor, **kwargs):
