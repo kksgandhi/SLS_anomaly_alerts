@@ -52,14 +52,14 @@ def get_test(sensor, **kwargs):
         test  = get_sls_data(sensor, start_date_test , end_date_test)
         return test, end_date_test
     else:
-        def aaa(x):
-            delta = datetime.timedelta(days=(1-x*test_delta))
+        def get_individual_test(offset):
+            delta = datetime.timedelta(days=(1-offset*test_delta))
             n_days_test  = datetime.timedelta(days=test_delta)
             start_date_test  = str(date - n_days_test - delta)
             end_date_test    = str(date - delta)
             test  = get_sls_data(sensor, start_date_test , end_date_test)
             return test
-        tests = list(map(aaa, range(int(1 / test_delta))))
+        tests = list(map(get_individual_test, range(int(1 / test_delta))))
         return tests, str(date)
 
 def clean_noaa(start_date, end_date):
@@ -101,6 +101,7 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
     aggregator     = kwargs.get("aggregator"    , np.mean)
     test_data      = kwargs.get("test_delta"    , 1)
     if isinstance(data, list):
+        kwargs["verbose"] = False
         return max(filter(lambda x: x is not None, map(lambda x: calculate_residuals(x, params, ftp_function, **kwargs), data)))
     try:
         xdata = data["timestamp"].apply(mdates.date2num)
