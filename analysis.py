@@ -111,8 +111,8 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
             plt.grid(b=True)
             plt.xlabel('Time', fontsize=20, labelpad=10)
             plt.ylabel('Water Level (m)', fontsize=20)
-            plt.scatter(xdata, data["adj_value"], color = "red", label='Sensor Data')
-            plt.plot(xdata, estimated_y, label='Fort Pulaski (fitted, not original)', color="green", linewidth=1)
+            plt.scatter(data["timestamp"], data["adj_value"], color = "red", label='Sensor Data')
+            plt.plot(data["timestamp"], estimated_y, label='Fort Pulaski (fitted, not original)', color="green", linewidth=1)
             plt.legend(loc='best', fontsize =16)
             plt.show()
 
