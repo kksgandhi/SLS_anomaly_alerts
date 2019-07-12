@@ -168,11 +168,20 @@ def full_sensor_test(sensor, **kwargs):
         params = fit_curve(train, ftp_function, **kwargs)
         train_residuals = calculate_residuals(train, params, ftp_function, **kwargs)    
         test_res_all = list(map(lambda curr_test: calculate_residuals(curr_test, params, ftp_function, **kwargs), test_all))
-        if save_plots and (test_res_all[0] > conf.ONE_HOUR_THRESHOLD or
-                           test_res_all[1] > conf.ONE_DAY_THRESHOLD or
-                           test_res_all[2] > conf.THREE_DAYS_THRESHOLD or
-                           num_pts_day < conf.MIN_VALUES_PER_DAY):
-            plot(test_all[2], params, ftp_function, plot_name=sensor_name,**kwargs)
+        if save_plots:
+            sensor_id = sensor["name"]
+            to_plot = False
+            to_plot = to_plot or (test_res_all[0] > conf.ONE_HOUR_THRESHOLD
+                                  and sensor_id not in conf.ONE_HOUR_IGNORE)
+            to_plot = to_plot or (test_res_all[1] > conf.ONE_DAY_THRESHOLD
+                                  and sensor_id not in conf.ONE_DAY_IGNORE)
+            to_plot = to_plot or (test_res_all[2] > conf.THREE_DAYS_THRESHOLD
+                                  and sensor_id not in conf.THREE_DAYS_IGNORE)
+            num_pts_day = 0 if not num_pts_day else num_pts_day
+            to_plot = to_plot or (num_pts_day < conf.MIN_VALUES_PER_DAY
+                                  and sensor_id not in conf.MIN_VALUES_IGNORE)
+            if to_plot:
+                plot(test_all[2], params, ftp_function, plot_name=sensor_name,**kwargs)
         print("Success: " + sensor_name)
         return train_residuals, test_res_all, num_pts_day
     except Exception as e:
