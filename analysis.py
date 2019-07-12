@@ -52,14 +52,14 @@ def get_test(sensor, **kwargs):
         test  = get_sls_data(sensor, start_date_test , end_date_test)
         return test, end_date_test
     else:
-        def get_individual_test(offset):
-            delta = datetime.timedelta(days=(1-offset*test_delta))
+        def aaa(x):
+            delta = datetime.timedelta(days=(1-x*test_delta))
             n_days_test  = datetime.timedelta(days=test_delta)
             start_date_test  = str(date - n_days_test - delta)
             end_date_test    = str(date - delta)
             test  = get_sls_data(sensor, start_date_test , end_date_test)
             return test
-        tests = list(map(get_individual_test, range(int(1 / test_delta))))
+        tests = list(map(aaa, range(int(1 / test_delta))))
         return tests, str(date)
 
 def clean_noaa(start_date, end_date):
