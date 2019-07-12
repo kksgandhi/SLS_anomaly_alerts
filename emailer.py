@@ -12,6 +12,10 @@ from datetime import date
 import os
 
 def daily_mail():
+    """
+    Send mail about the days interesting sensors
+    intended to be run daily
+    """
     with yagmail.SMTP(p_conf.USERNAME, p_conf.PASSWORD) as sender:
         params                 = {}
         params["to"]           = p_conf.TO_LIST
