@@ -7,3 +7,4 @@ ONE_HOUR_IGNORE      = []
 ONE_DAY_IGNORE       = []
 THREE_DAY_IGNORE     = []
 MIN_VALUES_IGNORE    = []
+CSV_OUTFILE = './daily_output.csv'
