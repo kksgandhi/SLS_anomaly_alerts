@@ -128,13 +128,14 @@ def full_sensor_test(sensor, **kwargs):
     test_res_all = []
     ends         = []
     num_pts_day  = 0
+    test_delta_array = kwargs.get("test_delta_array", [1,3,1/24])
     try:
         sensor_name = sensor["desc"]
         
         #get train
         train, start_date = get_train(sensor, **kwargs)
         #get test sets 
-        for test_range in kwargs["test_delta_array"]:
+        for test_range in test_delta_array:
             test, end = get_test(sensor, test_delta=test_range, **kwargs)
             test_all.append(test)
             ends.append(end)
