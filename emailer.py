@@ -8,6 +8,7 @@ import config as conf
 import yagmail
 from yagmail import inline
 from datetime import date
+import os
 
 def send_daily():
     with yagmail.SMTP(p_conf.USERNAME, p_conf.PASSWORD) as sender:
@@ -18,6 +19,9 @@ def send_daily():
                                  inline('./lava.jpg')]
         params["attachments"] = ['./test.csv']
         sender.send(**params)
+
+def get_all_pngs_in_current_dir():
+    return list(filter(lambda x: '.png' in x, os.listdir()))
 
 if __name__ == "__main__":
     send_daily()
