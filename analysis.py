@@ -95,11 +95,10 @@ def fit_curve(sls_data, ftp_function, **kwargs):
     return params
 
 def calculate_residuals(data, params, ftp_function, **kwargs):
-    #curve_equation = kwargs.get("curve_equation", noaa_function)
-    verbose        = kwargs.get("verbose"       , False)
-    scale_factor   = kwargs.get("scale_factor"  , 1000)
-    aggregator     = kwargs.get("aggregator"    , np.mean)
-    test_data      = kwargs.get("test_delta"    , 1)
+    verbose      = kwargs.get("verbose"     , False)
+    scale_factor = kwargs.get("scale_factor", 1000)
+    aggregator   = kwargs.get("aggregator"  , np.mean)
+    test_data    = kwargs.get("test_delta"  , 1)
     if isinstance(data, list):
         kwargs["verbose"] = False
         return max(filter(lambda x: x is not None, map(lambda x: calculate_residuals(x, params, ftp_function, **kwargs), data)))
