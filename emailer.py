@@ -34,6 +34,9 @@ def get_all_pngs_in_current_dir():
     return list(filter(lambda x: '.png' in x, os.listdir()))
 
 def list_anomalous_sensors():
+    """
+    creates email text discussing which sensors are flagged
+    """
     sensors = pd.read_csv(conf.CSV_OUTFILE)
     sens_1_hour  = sensors[sensors["flag_1hour"]]
     sens_1_day   = sensors[sensors["flag_1day"]]
