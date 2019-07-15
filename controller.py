@@ -9,6 +9,7 @@ import emailer
 import config as conf
 import os
 
+
 def daily_everything():
     """
     Runs daily analysis and sends daily email
@@ -21,6 +22,7 @@ def daily_everything():
     daily_data.to_csv(conf.CSV_OUTFILE)
     # send daily email
     emailer.daily_mail()
+
 
 if __name__ == "__main__":
     daily_everything()
