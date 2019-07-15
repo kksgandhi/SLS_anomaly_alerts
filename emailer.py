@@ -40,7 +40,9 @@ def list_anomalous_sensors():
     sens_3_day   = sensors[sensors["flag_3days"]]
     sens_min_val = sensors[sensors["flag_min_vals"]]
     def message_for_sensor(sensor):
-        return "{} ({})".format(sensor["desc"], sensor["name"])
+        return ("{} ({})".format(sensor["desc"], sensor["name"])
+                if not sensor.empty
+                else "This value is thrown away by pandas")
     return (["<font size=\"4\"><b>Sensors flagged for an hour-long event</b></font>"] + 
             list(sens_1_hour.apply(message_for_sensor, axis=1)) + 
             ["<font size=\"4\"><b>Sensors flagged for a day long event</b></font>"] + 
