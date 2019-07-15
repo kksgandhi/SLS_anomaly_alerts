@@ -2,7 +2,7 @@ try:
     import private_config as p_conf
 except ModuleNotFoundError:
     print("No private_config found!")
-    print("Fill out private_config_example.py and copy it to private_config.py")
+    print("copy private_config_example.py to private_config.py and fill it out")
     print("DO NOT ADD YOUR PRIVATE_CONFIG TO VERSION CONTROL")
     exit()
 import config as conf
