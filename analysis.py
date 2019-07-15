@@ -100,20 +100,33 @@ def get_ftp(start_date, end_date):
     return data
 
 def get_ftp_function(train_start, test_end):
+    """
+    creates the 'noaa ftp function' used in later curve fitting
+    see the docstrings for that function for more info
+    train_start: start of the training
+    test_end: end of the testing
+    """
     train_start = date_parser.parse(train_start)
     test_end = date_parser.parse(test_end)
-    noaa_offset = datetime.timedelta(days=7)
-    ftp = get_ftp(str(train_start - noaa_offset), str(test_end + noaa_offset))
+    FTP_OFFSET = datetime.timedelta(days=7)
+    ftp = get_ftp(str(train_start - FTP_OFFSET), str(test_end + FTP_OFFSET))
     
     xdata_noaa_range = ftp["timestamp"].apply(mdates.date2num)
     ydata_noaa_range = ftp["adj_v"]
     
-    def noaa_function(x, xshift, yshift):
+    def ftp_function(x, xshift, yshift):
+        """
+        given some 'x' (a date converted to an int by date2num)
+        returns the ft pulaski estimate at that x value
+        xshift and yshift shift the input and output respectively, 
+        but the programmer should not have to deal with them
+        instead later curve fitting should estimate those parameters
+        """
         f = interp1d(xdata_noaa_range, ydata_noaa_range, kind="cubic")
         inter_val = f(x + xshift)
         return ((inter_val) + yshift)
 
-    return noaa_function
+    return ftp_function
 
 def fit_curve(sls_data, ftp_function, **kwargs):
     #curve_equation = kwargs.get("curve_equation", noaa_function)
