@@ -3,7 +3,6 @@ import matplotlib.dates as mdates
 from scipy import optimize
 from scipy.optimize import curve_fit
 import numpy as np
-from scipy import optimize
 import csv
 import pandas as pd
 import dateutil.parser as date_parser
@@ -16,36 +15,59 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
 def get_sls_data(sensor, start_date, end_date):
+    """
+    Gets sls data for a sensor between start date and end date
+    adjusts measurements for elevation
+    """
     link      = sensor["link"]
     elevation = sensor["elev"]
-    #print(link)
-    #print(start_date)
-    #print(end_date)
     data      = scraper.get_obs_for_link(link, start_date, end_date)
-    #print(data)
     data      = pd.DataFrame(data, columns= ["value", "timestamp"])
-    #data      = data.sort_values(by = ['timestamp'])
     data["adj_value"] = data["value"].map(lambda value: float(elevation) + float(value))
     return data
 
 def get_train(sensor, **kwargs):
+    """
+    Gets training data to later fit the ft. pulaski function
+    This training data is a default of 7 days
+    in the interest of not overlapping with the test data,
+    it is 7 days offset by the largest test
+    kwargs:
+        date (str): date to get train data from (will be offset by testing periods)
+            default: today
+        train_delta (float): # of days of training data to get
+            default: 7 days
+        test_delta_array (list of floats): test deltas to use when choosing a training offset
+            default: [1]
+    """
     date = (date_parser.parse(kwargs["date"])
             if "date" in kwargs
             else datetime.datetime.utcnow())
     train_delta  = kwargs.get("train_delta", 7) 
     n_days_train = datetime.timedelta(days=train_delta)
-    
     max_test_offset = datetime.timedelta(days=max(kwargs.get("test_delta_array", [1])))
+
     start_date_train = str(date - (n_days_train +  max_test_offset))
     end_date_train   = str(date - max_test_offset)   
     train = get_sls_data(sensor, start_date_train, end_date_train)
     return train, start_date_train
 
 def get_test(sensor, **kwargs):
+    """
+    Gets test data for a sensor
+    two cases: if test_delta >= 1, simply gets that many days of data
+    if test_delta < 1, returns a list of test for the last day
+    e.g: if test_delta = 0.25, will return a list of 4 elements for each quarter of the day
+    honestly I think it's bad coding practice too, but we did what we could
+    kwargs:
+        date(str): date to get test data from
+            default: today
+        test_delta(float): amount of test data to get
+            default: 1 day
+    """
     date = (date_parser.parse(kwargs["date"])
             if "date" in kwargs
             else datetime.datetime.utcnow())
-
     test_delta   = kwargs.get("test_delta" , 1)
     if test_delta >= 1:
         n_days_test  = datetime.timedelta(days=test_delta)
