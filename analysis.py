@@ -221,6 +221,18 @@ def daily_test():
     sensors["test_residuals_1day"]  = residuals.apply(lambda res: res[1][1] if res else None)
     sensors["test_residuals_3days"] = residuals.apply(lambda res: res[1][2] if res else None)
     sensors["num_test_vals"]        = residuals.apply(lambda res: res[2]    if res else 0)
+    sensors["flag_1hour"] = (
+        (sensors["test_residuals_1hour"] > conf.ONE_HOUR_THRESHOLD) &
+        (sensors["name"].apply(lambda x: x not in conf.ONE_HOUR_IGNORE)))
+    sensors["flag_1day"] = (
+        (sensors["test_residuals_1day"] > conf.ONE_DAY_THRESHOLD) &
+        (sensors["name"].apply(lambda x: x not in conf.ONE_DAY_IGNORE)))
+    sensors["flag_3days"] = (
+        (sensors["test_residuals_3days"] > conf.THREE_DAYS_THRESHOLD) &
+        (sensors["name"].apply(lambda x: x not in conf.THREE_DAYS_IGNORE)))
+    sensors["flag_min_vals"] = (
+        (sensors["num_test_vals"] < conf.MIN_VALUES_PER_DAY) &
+        (sensors["name"].apply(lambda x: x not in conf.MIN_VALUES_IGNORE)))
     sensors = sensors.sort_values("num_test_vals", ascending=False)  
     sensors["run_date"] = datetime.datetime.utcnow()
     return sensors

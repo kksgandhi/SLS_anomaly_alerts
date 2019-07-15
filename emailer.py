@@ -35,27 +35,19 @@ def get_all_pngs_in_current_dir():
 
 def list_anomalous_sensors():
     sensors = pd.read_csv(conf.CSV_OUTFILE)
-    sens_1_hour  = sensors[
-        (sensors["test_residuals_1hour"] > conf.ONE_HOUR_THRESHOLD) &
-        (sensors["name"].apply(lambda x: x not in conf.ONE_HOUR_IGNORE))]
-    sens_1_day   = sensors[
-        (sensors["test_residuals_1day"] > conf.ONE_DAY_THRESHOLD) &
-        (sensors["name"].apply(lambda x: x not in conf.ONE_DAY_IGNORE))]
-    sens_3_day   = sensors[
-        (sensors["test_residuals_3days"] > conf.THREE_DAYS_THRESHOLD) &
-        (sensors["name"].apply(lambda x: x not in conf.THREE_DAYS_IGNORE))]
-    sens_min_val = sensors[
-        (sensors["num_test_vals"] < conf.MIN_VALUES_PER_DAY) &
-        (sensors["name"].apply(lambda x: x not in conf.MIN_VALUES_IGNORE))]
+    sens_1_hour  = sensors[sensors["flag_1hour"]]
+    sens_1_day   = sensors[sensors["flag_1day"]]
+    sens_3_day   = sensors[sensors["flag_3days"]]
+    sens_min_val = sensors[sensors["flag_min_vals"]]
     def message_for_sensor(sensor):
         return "{} ({})".format(sensor["desc"], sensor["name"])
-    return (["<b>Sensors flagged for an hour-long event</b>"] + 
+    return (["<font size=\"4\"><b>Sensors flagged for an hour-long event</b></font>"] + 
             list(sens_1_hour.apply(message_for_sensor, axis=1)) + 
-            ["<b>Sensors flagged for a day long event</b>"] + 
+            ["<font size=\"4\"><b>Sensors flagged for a day long event</b></font>"] + 
             list(sens_1_day.apply(message_for_sensor, axis=1)) + 
-            ["<b>Sensors flagged for a 3 day long event</b>"] + 
+            ["<font size=\"4\"><b>Sensors flagged for a 3 day long event</b></font>"] + 
             list(sens_3_day.apply(message_for_sensor, axis=1)) + 
-            ["<b>Sensors flagged for having too few values</b>"] + 
+            ["<font size=\"4\"><b>Sensors flagged for having too few values</b></font>"] + 
             list(sens_min_val.apply(message_for_sensor, axis=1)))
 
 ##
