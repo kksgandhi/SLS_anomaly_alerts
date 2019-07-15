@@ -220,7 +220,7 @@ def daily_test():
     sensors["test_residuals_1hour"] = residuals.apply(lambda res: res[1][0] if res else None)
     sensors["test_residuals_1day"]  = residuals.apply(lambda res: res[1][1] if res else None)
     sensors["test_residuals_3days"] = residuals.apply(lambda res: res[1][2] if res else None)
-    sensors["num_test_vals"]        = residuals.apply(lambda res: res[2]    if res else None)
+    sensors["num_test_vals"]        = residuals.apply(lambda res: res[2]    if res else 0)
     sensors = sensors.sort_values("num_test_vals", ascending=False)  
     sensors["run_date"] = datetime.datetime.utcnow()
     return sensors
