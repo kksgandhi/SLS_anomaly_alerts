@@ -129,14 +129,30 @@ def get_ftp_function(train_start, test_end):
     return ftp_function
 
 def fit_curve(sls_data, ftp_function, **kwargs):
-    #curve_equation = kwargs.get("curve_equation", noaa_function)
-    
+    """
+    given data and a function, 
+    fit that function so it best fits over the data
+    returns the parameters that create the best fit
+    """
     xdata = sls_data["timestamp"].apply(mdates.date2num)
     ydata = sls_data["adj_value"]    
     params, params_covariance = optimize.curve_fit(ftp_function, xdata, ydata)    
     return params
 
 def calculate_residuals(data, params, ftp_function, **kwargs):
+    """
+    calculates least squared difference residuals for given
+    data, parameters, and a function (which takes said parameters)
+    if the data is a list of lists, 
+    will return the max residual for all the data inside that list
+    kwargs:
+        verbose(bool): displays plots and raises errors
+            default: False
+        scale_factor(float): amount to multiply residuals by (for human comprehension)
+            default: 1000
+        aggregator(function): given the array of residuals, how to reduce them
+            default: np.mean
+    """
     verbose      = kwargs.get("verbose"     , False)
     scale_factor = kwargs.get("scale_factor", 1000)
     aggregator   = kwargs.get("aggregator"  , np.mean)
@@ -160,11 +176,26 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
         return None
 
 def plot(data, params, ftp_function, **kwargs):
-    xdata = kwargs.get("xdata", data["timestamp"].apply(mdates.date2num))
+    """
+    plots the tidal data and the fitted curve
+    kwargs:
+        xdata(numpy array): x values (converted via date2num)
+            default: retrieved from data
+        estimated_y(numpy array): y values of the ftp function
+            default: retrieved from data
+        verbose(bool): show plots?
+            default: False
+        save_plots(bool): save the plots? (OVERRIDES VERBOSE)
+            default: False
+        plot_name(str): Title
+            default: ""
+    """
+    xdata       = kwargs.get("xdata", data["timestamp"].apply(mdates.date2num))
     estimated_y = kwargs.get("estimated_y", ftp_function(xdata, *params))
-    verbose = kwargs.get("verbose", False)
-    save_plots = kwargs.get("save_plots", False)
-    plot_name = kwargs.get("plot_name", "")
+    verbose     = kwargs.get("verbose", False)
+    save_plots  = kwargs.get("save_plots", False)
+    plot_name   = kwargs.get("plot_name", "")
+
     plt.figure(figsize=(30, 20))
     plt.grid(b=True)
     plt.xlabel('Time', fontsize=20, labelpad=10)
@@ -172,6 +203,7 @@ def plot(data, params, ftp_function, **kwargs):
     plt.scatter(data["timestamp"], data["adj_value"], color = "red", label='Sensor Data')
     plt.plot(data["timestamp"], estimated_y, label='Fort Pulaski (fitted, not original)', color="green", linewidth=1)
     plt.legend(loc='best', fontsize =16)
+
     if save_plots:
         plt.title(plot_name, fontdict={'fontsize':36})
         plt.savefig(plot_name + ".png", bbox_inches='tight')
@@ -181,7 +213,15 @@ def plot(data, params, ftp_function, **kwargs):
 
 #defaults to current day as the test day 
 def full_sensor_test(sensor, **kwargs):
-    
+    """
+    given a sensor (row of the sensors dataframe) runs a full test on it
+    kwargs are passed on to the inner functions
+    returns:
+        train_residuals (error from fitting the ftp curve on the training data)
+        test_res_all (3 values, residuals from the 1 hour test, 1 day test, and 3 days test)
+        num_pts_day (number of observations for the sensor)
+        flags (4 values, whether the test residuals and num_pts_day were above the config threshold)
+    """
     test_all     = []
     test_res_all = []
     ends         = []
