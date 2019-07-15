@@ -92,10 +92,10 @@ def get_ftp(start_date, end_date):
     Gets predictions from the ft pulaski sensor.
     This sensor acts like a baseline to compare other sensors to
     """
-    YSHIFT_GUESS      = 0.5
     data              = scraper.get_ft_pulaski(start_date, end_date)
     data              = pd.DataFrame(data)
-    data["adj_v"]     = data["v"].apply(lambda x: float(x) - YSHIFT_GUESS)
+    # no actual adjustments are done, but this line still remains
+    data["adj_v"]     = data["v"]
     data["timestamp"] = data["t"].apply(date_parser.parse) 
     return data
 
