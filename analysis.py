@@ -241,6 +241,7 @@ def full_sensor_test(sensor, **kwargs):
             ends.append(end)
         
         num_pts_day = len(test_all[1])
+        num_pts_day = 0 if not num_pts_day else num_pts_day
         
         end_date = max(ends)
         ftp_function = get_ftp_function(start_date, end_date)
