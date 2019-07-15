@@ -87,7 +87,7 @@ def get_test(sensor, **kwargs):
         tests = list(map(get_individual_test, range(int(1 / test_delta))))
         return tests, str(date)
 
-def clean_noaa(start_date, end_date):
+def get_ftp(start_date, end_date):
     YSHIFT_GUESS = 0.5
     data              = scraper.get_ft_pulaski(start_date, end_date)
     data              = pd.DataFrame(data)
@@ -99,7 +99,7 @@ def get_ftp_function(train_start, test_end):
     train_start = date_parser.parse(train_start)
     test_end = date_parser.parse(test_end)
     noaa_offset = datetime.timedelta(days=7)
-    ftp = clean_noaa(str(train_start - noaa_offset), str(test_end + noaa_offset))
+    ftp = get_ftp(str(train_start - noaa_offset), str(test_end + noaa_offset))
     
     xdata_noaa_range = ftp["timestamp"].apply(mdates.date2num)
     ydata_noaa_range = ftp["adj_v"]
