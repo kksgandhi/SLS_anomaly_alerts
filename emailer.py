@@ -9,21 +9,25 @@ import config as conf
 import yagmail
 from yagmail import inline
 from datetime import date
+from pprint import pprint as print
 import os
 
-def daily_mail():
+def daily_mail(send=True):
     """
     Send mail about the days interesting sensors
     intended to be run daily
     """
-    with yagmail.SMTP(p_conf.USERNAME, p_conf.PASSWORD) as sender:
-        params                 = {}
-        params["to"]           = p_conf.TO_LIST
-        params["subject"]      = f"{date.today()} anomaly updates"
-        params["contents"]     = ["Attached are interesting sensors"]
-        params["attachments"]  = [conf.CSV_OUTFILE]
-        params["attachments"] += get_all_pngs_in_current_dir()
-        sender.send(**params)
+    params                 = {}
+    params["to"]           = p_conf.TO_LIST
+    params["subject"]      = f"{date.today()} anomaly updates"
+    params["contents"]     = ["Attached are interesting sensors"]
+    params["attachments"]  = [conf.CSV_OUTFILE]
+    params["attachments"] += get_all_pngs_in_current_dir()
+    if send:
+        with yagmail.SMTP(p_conf.USERNAME, p_conf.PASSWORD) as sender:
+            sender.send(**params)
+    else:
+        print(params)
 
 def get_all_pngs_in_current_dir():
     return list(filter(lambda x: '.png' in x, os.listdir()))
