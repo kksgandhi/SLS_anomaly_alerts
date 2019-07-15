@@ -1,3 +1,9 @@
+import config as conf
+import yagmail
+from yagmail import inline
+from datetime import date
+from pprint import pprint as print
+import os
 try:
     import private_config as p_conf
 except ModuleNotFoundError:
@@ -5,12 +11,6 @@ except ModuleNotFoundError:
     print("copy private_config_example.py to private_config.py and fill it out")
     print("DO NOT ADD YOUR PRIVATE_CONFIG TO VERSION CONTROL")
     exit()
-import config as conf
-import yagmail
-from yagmail import inline
-from datetime import date
-from pprint import pprint as print
-import os
 
 def daily_mail(send=True):
     """
