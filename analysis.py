@@ -156,16 +156,17 @@ def calculate_residuals(data, params, ftp_function, **kwargs):
     verbose      = kwargs.get("verbose"     , False)
     scale_factor = kwargs.get("scale_factor", 1000)
     aggregator   = kwargs.get("aggregator"  , np.mean)
-    test_data    = kwargs.get("test_delta"  , 1)
-    if isinstance(data, list):
-        kwargs["verbose"] = False
-        return max(filter(lambda x: x is not None, map(lambda x: calculate_residuals(x, params, ftp_function, **kwargs), data)))
     try:
+        if isinstance(data, list):
+            kwargs["verbose"] = False
+            # this hellish line just calculates 
+            # the max residual for all the data in the list
+            return max(filter(lambda x: x is not None, map(lambda x: calculate_residuals(x, params, ftp_function, **kwargs), data)))
         xdata = data["timestamp"].apply(mdates.date2num)
         estimated_y = ftp_function(xdata, *params)
 
         if verbose:
-            plot(data, params, ftp_function,xdata=xdata, estimated_y=estimated_y, **kwargs)
+            plot(data, params, ftp_function, xdata=xdata, estimated_y=estimated_y, **kwargs)
 
         squared_residuals = (estimated_y - data["adj_value"]) ** 2
 
