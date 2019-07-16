@@ -291,6 +291,7 @@ def full_sensor_test(sensor, **kwargs):
                       sensor_id not in conf.MIN_VALUES_IGNORE)
         flags = (flag_1hour, flag_1day, flag_3days, flag_min_vals)
 
+        # save the plots
         if save_plots and (flag_1hour or flag_1day or
                            flag_3days or flag_min_vals):
             plot(test_all[2], params, ftp_function,
