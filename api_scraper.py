@@ -9,6 +9,7 @@ from pprint import pprint as print
 
 base_url_sls  = 'https://api.sealevelsensors.org/v1.0/Things'
 base_url_noaa = 'https://tidesandcurrents.noaa.gov/api/datagetter'
+DEFAULT_START_DATE = 'April 1 2019'
 
 def get_sensor_datastreams():
     """
@@ -86,7 +87,7 @@ def get_obs_for_link(link, start_date=None, end_date=None):
         params["$resultFormat"] =  "dataArray"
 
     if end_date and not start_date:
-        start_date = "April 1 2019"
+        start_date = DEFAULT_START_DATE
 
     start_date = date_parser.parse(start_date).isoformat() + "Z" if start_date else None
     end_date   = date_parser.parse(end_date).isoformat()   + "Z" if end_date   else None
