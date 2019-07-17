@@ -108,10 +108,15 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
                 # the last cached observation
                 end_observations = observations[-1][1]
                 if parsed_end_date > end_observations:
-                    # if the requested end date goes beyond the cache, we need more data
-                    # note the [:-6]. This is a hacky bandaid because 
-                    # for some reason the date format wasn't working
-                    observations += get_obs_for_link_uncached(link, str(end_observations)[:-6], str(today))
+                    """
+                    if the requested end date goes beyond the cache, we need more data
+                    note the [:-6]. This is a hacky bandaid because 
+                    for some reason the date format wasn't working
+                    also note the [1:]
+                    this is because the first element is duplicated 
+                    in the cache and when getting new data
+                    """
+                    observations += get_obs_for_link_uncached(link, str(end_observations)[:-6], str(today))[1:]
                 else:
                     do_update = False
         except FileNotFoundError:
