@@ -6,6 +6,11 @@ see https://dev.sealevelsensors.org/
 import requests as req
 import dateutil.parser as date_parser
 from pprint import pprint as print
+import json
+import os
+import datetime
+import binary_search as bs
+import re
 
 base_url_sls  = 'https://api.sealevelsensors.org/v1.0/Things'
 base_url_noaa = 'https://tidesandcurrents.noaa.gov/api/datagetter'
@@ -58,9 +63,47 @@ def get_sensors_with_obs_type(type_name="Water Level"):
   # the filter simply removes all the Nones due to sensors that don't have a water level link
   return list(filter(None, map(get_link_from_sensor, all_sensor_links)))
 
-def get_obs_for_link(link, start_date=None, end_date=None):
+def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False):
+    observations = []
+    file_name = './cache/' + "".join(re.split("[^a-zA-Z0-9]*", link)) + '.json'
+    today = str(datetime.datetime.utcnow())
+    utcparse = lambda x: date_parser.parse(x).replace(tzinfo=datetime.timezone.utc)
+    parsed_start_date = (utcparse(start_date)
+                        if start_date 
+                        else date_parser.parse(DEFAULT_START_DATE))
+    parsed_end_date = (utcparse(end_date)
+                       if end_date 
+                       else datetime.datetime.now(datetime.timezone.utc))
+    do_update = True
+    if not reset_cache:
+        if not os.path.isdir('./cache'):
+            os.mkdir('./cache')
+        try:
+            with open(file_name) as cache_file:
+                observations = list(map(lambda x: (x[0], utcparse(x[1])), json.load(cache_file)))
+                end_observations = observations[-1][1]
+                if parsed_end_date > end_observations:
+                    observations += get_obs_for_link_uncached(link, str(end_observations)[:-6], str(today))
+                else:
+                    do_update = False
+        except FileNotFoundError:
+            observations = get_obs_for_link_uncached(link, DEFAULT_START_DATE, today)
+    else:
+        observations = get_obs_for_link_uncached(link, DEFAULT_START_DATE, today)
+
+    if do_update:
+        with open(file_name, 'w') as cache_file:
+            jsonible_observations = list(map(lambda x: (x[0], str(x[1])), observations))
+            json.dump(jsonible_observations, cache_file)
+
+    start_index = bs.search(observations, (None, parsed_start_date), key=lambda x: x[1])
+    end_index   = bs.search(observations, (None, parsed_end_date),   key=lambda x: x[1])
+
+    return observations[start_index:end_index]
+
+def get_obs_for_link_uncached(link, start_date=None, end_date=None):
     """
-    Gets all observations for a given link
+    Gets all observations for a given link without using any cache
 
     The observations are sorted by date.
     The return list has datetime objects inside, which may pose a challenge
@@ -113,7 +156,7 @@ def get_obs_for_link(link, start_date=None, end_date=None):
     includes all the params
     """
     if "@iot.nextLink" in response:
-        all_observations = get_obs_for_link(response['@iot.nextLink']) + observations
+        all_observations = get_obs_for_link_uncached(response['@iot.nextLink']) + observations
         # sort the observations by time if this is the top of the recursion
         if not is_iot_next_link:
             return sorted(all_observations, key=lambda x: x[1])
