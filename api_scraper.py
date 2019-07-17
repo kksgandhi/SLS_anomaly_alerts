@@ -63,9 +63,30 @@ def get_sensors_with_obs_type(type_name="Water Level"):
   # the filter simply removes all the Nones due to sensors that don't have a water level link
   return list(filter(None, map(get_link_from_sensor, all_sensor_links)))
 
-def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False):
+def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, cache_folder='cache'):
+    """
+    Gets all observations for a given link and caches it for future use
+
+    The observations are sorted by date.
+    The return list has datetime objects inside, which may pose a challenge
+    to json serialization
+
+    This code has only been tested on water observations
+    may need tweaking for other observation types
+
+    Parameters:
+        link         (str):             Datastream link to collect observations from
+        start_date   (str)  (optional): Date to start  collecting observations from
+        end_date     (str)  (optional): Date to finish collecting observations from
+        reset_cache  (bool) (optional): Delete the cache and create a new one
+        cache_folder (str)  (optional): Folder to look for cache files
+
+    Returns:
+        observations (list): a list of tuples, (observation, date_of_observation)
+    """
     observations = []
-    file_name = './cache/' + "".join(re.split("[^a-zA-Z0-9]*", link)) + '.json'
+    # the file name is quite absurd, but unique
+    file_name = './' + cache_folder + '/' + "".join(re.split("[^a-zA-Z0-9]*", link)) + '.json'
     today = str(datetime.datetime.utcnow())
     utcparse = lambda x: date_parser.parse(x).replace(tzinfo=datetime.timezone.utc)
     parsed_start_date = (utcparse(start_date)
@@ -74,31 +95,43 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False):
     parsed_end_date = (utcparse(end_date)
                        if end_date 
                        else datetime.datetime.now(datetime.timezone.utc))
+    # whether or not to write out a new cache
     do_update = True
     if not reset_cache:
-        if not os.path.isdir('./cache'):
-            os.mkdir('./cache')
+        # if there is no folder to store caches in, create one
+        if not os.path.isdir('./' + cache_folder):
+            os.mkdir('./' + cache_folder)
         try:
             with open(file_name) as cache_file:
+                # load and parse all the observations
                 observations = list(map(lambda x: (x[0], utcparse(x[1])), json.load(cache_file)))
+                # the last cached observation
                 end_observations = observations[-1][1]
                 if parsed_end_date > end_observations:
+                    # if the requested end date goes beyond the cache, we need more data
+                    # note the [:-6]. This is a hacky bandaid because 
+                    # for some reason the date format wasn't working
                     observations += get_obs_for_link_uncached(link, str(end_observations)[:-6], str(today))
                 else:
                     do_update = False
         except FileNotFoundError:
+            # if there is no existing cache, create one with all the data you can get
             observations = get_obs_for_link_uncached(link, DEFAULT_START_DATE, today)
     else:
+        # or if the cache is requested to be reset
         observations = get_obs_for_link_uncached(link, DEFAULT_START_DATE, today)
 
+    # write the data back out to the cache
     if do_update:
         with open(file_name, 'w') as cache_file:
             jsonible_observations = list(map(lambda x: (x[0], str(x[1])), observations))
             json.dump(jsonible_observations, cache_file)
 
+    # now to actually give the requester what they wanted
     start_index = bs.search(observations, (None, parsed_start_date), key=lambda x: x[1])
     end_index   = bs.search(observations, (None, parsed_end_date),   key=lambda x: x[1])
 
+    # slice all the observations to what the request was
     return observations[start_index:end_index]
 
 def get_obs_for_link_uncached(link, start_date=None, end_date=None):
