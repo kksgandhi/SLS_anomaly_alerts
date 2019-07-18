@@ -1,0 +1,96 @@
+
+
+
+/* map css */
+.info {
+   padding: 6px 8px;
+   font: 14px/16px Arial, Helvetica, sans-serif;
+   background: white;
+   background: rgba(255,255,255,0.8);
+   box-shadow: 0 0 15px rgba(0,0,0,0.2);
+   border-radius: 5px;
+}
+.info h4 {
+   margin: 0 0 5px;
+   color: blue;
+}
+
+
+
+
+#wrapper {
+  			display: flex;
+		}
+#mapid {  width: 700px; height: 600px; flex: 0 0 45%; margin:20px 20px 20px 20px;}
+#mapid2 {  width: 700px; height: 600px; flex: 0 0 45%; margin:20px 20px 20px 20px;}
+
+
+.plot-title{
+  font-color: red;
+}
+
+/* Dropdown Button */
+.dropbtn {
+  background-color: #3498DB;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropbtn-2 {
+  background-color: green;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #2980B9;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 450px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  border: 1px solid #ddd;
+}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
+
+/*
+for search bar
+*/
+
+.search {
+	color: black;
+	min-width: 450px;
+  	font-size: 16px;
+  	padding: 12px 20px 12px 10px;
+  	border: 1px solid #ddd;
+  	margin-bottom: 12px;
+}
+
+.options {
+	color: black;
+	min-width: 70px;
+  	font-size: 16px;
+  	padding: 10px 18px 10px 8px;
+  	border: 1px solid #ddd;
+  	margin-bottom: 5px;
+}
