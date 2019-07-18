@@ -16,7 +16,7 @@ def daily_everything():
     clears all pictures from the previous day
     """
     # clear all pictures from the previous day
-    list(map(os.remove, emailer.get_all_pngs_in_current_dir()))
+    list(map(os.remove, emailer.get_all_pngs()))
     # run daily analysis and put it in a csv
     daily_data = analysis.daily_test()
     daily_data.to_csv(conf.CSV_OUTFILE)

@@ -226,7 +226,7 @@ def plot(data, params, ftp_function, **kwargs):
 
     if save_plots:
         plt.title(plot_name, fontdict={'fontsize':36})
-        plt.savefig(plot_name + ".png", bbox_inches='tight')
+        plt.savefig('./images/' + plot_name + ".png", bbox_inches='tight')
     elif verbose:
         plt.show()
     plt.close()

@@ -23,15 +23,15 @@ def daily_mail(send=True):
     params["subject"]      = f"{date.today()} anomaly updates"
     params["contents"]     = list_anomalous_sensors()
     params["attachments"]  = [conf.CSV_OUTFILE]
-    params["attachments"] += get_all_pngs_in_current_dir()
+    params["attachments"] += get_all_pngs()
     if send:
         with yagmail.SMTP(p_conf.USERNAME, p_conf.PASSWORD) as sender:
             sender.send(**params)
     else:
         print(params)
 
-def get_all_pngs_in_current_dir():
-    return list(filter(lambda x: '.png' in x, os.listdir()))
+def get_all_pngs():
+    return list(filter(lambda x: '.png' in x, os.listdir('./images/')))
 
 def list_anomalous_sensors():
     """

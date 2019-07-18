@@ -129,6 +129,7 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
     # write the data back out to the cache
     if do_update:
         with open(file_name, 'w') as cache_file:
+            # convert to string because json can't write otherwise
             jsonible_observations = list(map(lambda x: (x[0], str(x[1])), observations))
             json.dump(jsonible_observations, cache_file)
 
