@@ -37,7 +37,7 @@ async function main(){
     var promices = [];
 
 
-    start_date = "June 1 2019";
+    start_date = "April 1 2019";
     test_date = new Date();
     var yyyy = (test_date.getYear() + 1900).toString();
     var mm = (test_date.getMonth() + 1).toString();
@@ -46,6 +46,8 @@ async function main(){
     var min = (test_date.getMinutes()).toString();
     test_date = yyyy + " " + mm + " " + dd + " " + hh + ":" + min
     end_date = test_date;
+    console.log(start_date)
+    console.log(end_date)
 
 
     for(sensor of api_data){
@@ -62,8 +64,7 @@ async function main(){
 
       promices.push($.get("/get_obs_for_link", {
                                       link: sensor.link,
-                                      start_date: start_date,
-                                      end_date: end_date}))
+                                      start_date: start_date}))
 
       }
       var datas = [];
