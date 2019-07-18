@@ -135,7 +135,7 @@ def get_ftp_function(train_start, test_end):
 
     return ftp_function
 
-def fit_curve(sls_data, ftp_function, **kwargs):
+def fit_curve(sls_data, function, **kwargs):
     """
     given data and a function, 
     fit that function so it best fits over the data
@@ -143,7 +143,7 @@ def fit_curve(sls_data, ftp_function, **kwargs):
     """
     xdata = sls_data["timestamp"].apply(mdates.date2num)
     ydata = sls_data["adj_value"]    
-    params, params_covariance = optimize.curve_fit(ftp_function, xdata, ydata)    
+    params, params_covariance = optimize.curve_fit(function, xdata, ydata)    
     return params
 
 def calculate_residuals(data, params, ftp_function, **kwargs):
