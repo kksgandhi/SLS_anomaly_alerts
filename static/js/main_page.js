@@ -287,7 +287,8 @@ async function main(){
     var oneday = []
     var threeday = []
     var minval = []
-    d3.csv("../../daily_output.csv", function(data){
+    $.get("/daily_output", function(data){
+    console.log(data);
       var run_date = new Date(data[0].run_date);
 
       data.forEach(function(d){
@@ -806,7 +807,7 @@ async function main(){
                             });
 
 
-            let sensor_groups = await $.getJSON('sensor_groupings.json');
+            let sensor_groups = await $.get('/sensor_groupings');
             var group_pane = document.getElementById("group_select");
             group_names = Object.keys(sensor_groups)
 
