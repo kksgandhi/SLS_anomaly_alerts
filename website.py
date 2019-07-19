@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import api_scraper
+import csv
+import config as conf
 
 app = Flask(__name__)
 
@@ -17,7 +19,19 @@ def get_sensors_with_obs_type_wrapper():
 @app.route("/get_obs_for_link")
 def get_obs_for_link_wrapper():
     args = request.args
-    return jsonify(api_scraper.get_obs_for_link(link=args["link"], start_date=args["start_date"], end_date=args["end_date"]))
+    return jsonify(api_scraper.get_obs_for_link(link=args["link"], start_date=args["start_date"]))
+
+
+@app.route("/daily_output")
+def get_daily_csv():
+    with open(conf.CSV_OUTFILE, "r") as f:
+        reader = csv.DictReader(f)
+        return jsonify(list(reader))
+
+
+@app.route("/sensor_groupings")
+def get_sensor_groupings():
+    return jsonify(conf.SENSOR_GROUPINGS)
 
 
 if __name__ == "__main__":
