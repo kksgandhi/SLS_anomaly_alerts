@@ -302,21 +302,21 @@ async function main(){
         if (d.flag_1day == "True"){
           oneday.push({
             "name": d.desc,
-            "res": d.test_residuals_1hour
+            "res": d.test_residuals_1day
           })
         }
 
         if (d.flag_3days == "True"){
           threeday.push({
             "name": d.desc,
-            "res": d.test_residuals_1hour
+            "res": d.test_residuals_3days
           })
         }
 
         if (d.flag_min_vals == "True"){
           minval.push({
             "name": d.desc,
-            "res": d.test_residuals_1hour
+            "res": d.num_test_vals
           })
         }
       });
