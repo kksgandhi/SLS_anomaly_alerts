@@ -1,0 +1,124 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <title>Line Plot Trial</title>
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+		integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+		crossorigin=""/>
+
+		<!-- Make sure you put this AFTER Leaflet's CSS -->
+		<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+		integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+		crossorigin=""></script>
+
+        <style>
+
+		#mapid {  width: 700px; height: 100vh; flex: 0 0 35%; margin:0px 20px 0px 0px;}
+
+		</style>
+    </head>
+    <body>
+        <!-- <h1>Smart Sea Level Sensors with API</h1> -->
+
+
+
+  <div id="wrapper">
+
+      <!-- map -->
+ 			<div id="mapid"></div>
+
+
+      <!-- plots -->
+ 			 <div id="mapid2">
+         <!-- buttons -->
+         <div class="buttons">
+           <div class="dropdown">
+             <button onclick="myFunction()" class="dropbtn">All Sensors</button>
+             <div id="myDropdown" class="dropdown-content"></div>
+           </div>
+
+           <div class="dropdown">
+             <button onclick="myFunction_2()" class="dropbtn">Choose Groups</button>
+             <div id="group_select" class="dropdown-content"></div>
+           </div>
+
+           <div class="dropdown" id="menu">
+             <button class = "dropbtn" id="anom_button" type="button">Show/Hide Anomalies</button>
+           </div>
+           
+           <div class="dropdown" id="menu">
+             <button class = "dropbtn" id="norm_button" type="button">Show/Hide Working Sensors</button>
+           </div>
+           
+        </div>
+
+          <!-- first plot -->
+          <h1 class="plot-title">Normalized Water Level Measurements</h1>
+          <h2 class="plot-title" id = "anom-sens-text" style = "display: none">Anomalous Sensors</h1>
+
+
+           <svg></svg>
+
+           <!-- slider -->
+           <div id="slider"></div>
+           <div class="row align-items-center">
+       		<div class="col-sm-2"><p id="value-range"></p></div>
+       		<div class="col-sm"><div id="slider-range"></div></div>
+          </div>
+
+
+          <div id="error-text" style="display: none;">
+            <div id="type1">Type 1 Error (1 hour): </div>
+            <div id="type2">Type 2 Error (1 day): </div>
+            <div id="type3">Type 3 Error (3 day): </div>
+            <div id="type4">Type 4 Error (not enough points): </div>
+          </div>
+
+          <!-- second plot -->
+          <h1 class="plot-title">Summary Statistic Plot</h1>
+          <div id="menu-2">
+          </div>
+          	<div>
+          		<svg id ='svg2'></svg>
+          	</div>
+
+            <div class="row align-items-center">
+          		<div class="col-sm-2"><p id="value-range2"></p></div>
+          		<div class="col-sm"><div id="slider-range2"></div></div>
+          	  </div>
+        </div>
+
+        </div>
+
+	  </div>
+
+	<script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function myFunction() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+function myFunction_2() {
+  document.getElementById("group_select").classList.toggle("show");
+}
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+  }
+}
+
+</script>
+
+
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+
+		<script src="https://unpkg.com/d3-simple-slider"></script>
+
+        <script src="{{url_for('static', filename='js/index_backup_2.js')}}"></script>
+        <script type="text/JSON" src="sensor_groupings.json"></script>
+    </body>
+</html>
