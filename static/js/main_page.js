@@ -37,7 +37,7 @@ async function main(){
     var promices = [];
 
 
-    start_date = "April 1 2019";
+    start_date = "July 10 2019";
     test_date = new Date();
     var yyyy = (test_date.getYear() + 1900).toString();
     var mm = (test_date.getMonth() + 1).toString();
@@ -72,6 +72,7 @@ async function main(){
       for (promice of promices){
         datas.push(await promice);
       }
+      
       for (data of datas){
         console.log(data)
         //let data = await promice;
@@ -302,21 +303,21 @@ async function main(){
         if (d.flag_1day == "True"){
           oneday.push({
             "name": d.desc,
-            "res": d.test_residuals_1hour
+            "res": d.test_residuals_1day
           })
         }
 
         if (d.flag_3days == "True"){
           threeday.push({
             "name": d.desc,
-            "res": d.test_residuals_1hour
+            "res": d.test_residuals_3days 
           })
         }
 
         if (d.flag_min_vals == "True"){
           minval.push({
             "name": d.desc,
-            "res": d.test_residuals_1hour
+            "res": d.num_test_vals 
           })
         }
       });
@@ -341,6 +342,7 @@ async function main(){
       anom_button.onclick = toggleAnomaly;
 
       function toggleAnomaly(){
+      	console.log('toggle')
         var res_text = document.getElementById("error-text");
         if (res_text.style.display == "none"){
           showAnomaly();
@@ -350,8 +352,8 @@ async function main(){
       }
 
 
-
       function showAnomaly(){
+      		console.log('here')
             //display anomalous sensor names - can only be run once
             disp_anom_sens();
             document.getElementById("error-text").style.display = "block";
@@ -859,12 +861,6 @@ async function main(){
               }
               updateChecks();
             }
-
-
-
-
-
-
 
             /*
             create filter search bar

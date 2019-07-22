@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("anomaly_main_page.html")
+    return render_template("index.html")
 
 
 @app.route("/get_sensors_with_obs_type")
