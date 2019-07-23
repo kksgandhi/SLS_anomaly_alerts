@@ -17,12 +17,14 @@ base_url_sls  = 'https://api.sealevelsensors.org/v1.0/Things'
 base_url_noaa = 'https://tidesandcurrents.noaa.gov/api/datagetter'
 DEFAULT_START_DATE = 'April 1 2019'
 
+
 def get_sensor_datastreams():
     """
     Creates a list of all sensors with datastream links.
 
     Returns:
-        sensors (list): a list of 'sensors', each sensor being a dictonary with information on the sensor
+        sensors (list): a list of 'sensors', each sensor being a dictonary with
+            information on the sensor
     """
     api_response = req.get(base_url_sls).json()
     def create_sensor_obj(sensor):
@@ -37,32 +39,36 @@ def get_sensor_datastreams():
           "coords": coordinates}
     return list(map(create_sensor_obj, api_response["value"]))
 
-def get_sensors_with_obs_type(type_name="Water Level"):
-  """
-  Creates a list of all sensors with water level observation links.
 
-  Returns:
-      sensors (list): a list of 'sensors', each sensor being a dictonary with information on the sensor
-  """
-  all_sensor_links = get_sensor_datastreams()
-  def get_link_from_sensor(sensor):
-      """Grabs the requested datastream from the sensor if it has one."""
-      # get all the observation types then filter the ones that say "Water Level"
-      obs_type_list   = req.get(sensor["link"]).json()["value"]
-      only_water_list = list(filter(lambda obs_type: obs_type["name"] == type_name, obs_type_list))
-      # some don't have a water level. Just return in that case
-      if len(only_water_list) == 0:
-          return
-      # variable naming is not my forte
-      wataaa = only_water_list[0]
-      return {
-          "name":   sensor["name"],
-          "desc":   sensor["desc"],
-          "elev":   sensor["elev"],
-          "coords": sensor["coords"],
-          "link":   wataaa['Observations@iot.navigationLink']}
-  # the filter simply removes all the Nones due to sensors that don't have a water level link
-  return list(filter(None, map(get_link_from_sensor, all_sensor_links)))
+def get_sensors_with_obs_type(type_name="Water Level"):
+    """
+    Creates a list of all sensors with water level observation links.
+
+    Parameters:
+        type_name (str): type of observation to get
+    Returns:
+        sensors (list): a list of 'sensors', each sensor being a dictionary
+            with information on the sensor
+    """
+    all_sensor_links = get_sensor_datastreams()
+    def get_link_from_sensor(sensor):
+        """Grabs the requested datastream from the sensor if it has one."""
+        # get all the observation types then filter the ones that say "Water Level"
+        obs_type_list   = req.get(sensor["link"]).json()["value"]
+        only_water_list = list(filter(lambda obs_type: obs_type["name"] == type_name, obs_type_list))
+        # some don't have a water level. Just return in that case
+        if len(only_water_list) == 0:
+            return
+        # variable naming is not my forte
+        wataaa = only_water_list[0]
+        return {
+            "name":   sensor["name"],
+            "desc":   sensor["desc"],
+            "elev":   sensor["elev"],
+            "coords": sensor["coords"],
+            "link":   wataaa['Observations@iot.navigationLink']}
+    # the filter simply removes all the Nones due to sensors that don't have a water level link
+    return list(filter(None, map(get_link_from_sensor, all_sensor_links)))
 
 def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, cache_folder='cache'):
     """
@@ -75,6 +81,9 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
     This code has only been tested on water observations
     may need tweaking for other observation types
 
+    TODO: THIS CACHE IS NOT VERY INTELLIGENT.
+    A PROPER DATABASE OR SOMETHING WOULD BE A GODSEND
+
     Parameters:
         link         (str):             Datastream link to collect observations from
         start_date   (str)  (optional): Date to start  collecting observations from
@@ -86,7 +95,7 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
         observations (list): a list of tuples, (observation, date_of_observation)
     """
     observations = []
-    # the file name is quite absurd, but unique
+    # the file name is quite absurd, but hopefully unique
     file_name = './' + cache_folder + '/' + "".join(re.split("[^a-zA-Z0-9]*", link)) + '.json'
     today = str(datetime.datetime.utcnow())
     utcparse = lambda x: date_parser.parse(x).replace(tzinfo=tzutc())
@@ -140,6 +149,7 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
 
     # slice all the observations to what the request was
     return observations[start_index:end_index]
+
 
 def get_obs_for_link_uncached(link, start_date=None, end_date=None):
     """
@@ -227,14 +237,15 @@ def get_ft_pulaski(start_date, end_date):
         "units":       "metric",
         "format":      "json"
     }
-    format_time = lambda date: (date_parser
-                                    .parse(date)
-                                    .strftime("%Y%m%d %H:%M"))
+
+    def format_time(date):
+        return date_parser.parse(date).strftime("%Y%m%d %H:%M")
 
     params["begin_date"] = format_time(start_date)
     params["end_date"]   = format_time(end_date)
 
     return req.get(base_url_noaa, params=params).json()["predictions"]
+
 
 if __name__ == "__main__":
     waaata = get_sensors_with_obs_type()
