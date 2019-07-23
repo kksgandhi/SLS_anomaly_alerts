@@ -15,6 +15,7 @@ THREE_DAYS_IGNORE = []
 MIN_VALUES_IGNORE = []
 # name of file where daily output should be stored
 CSV_OUTFILE = './daily_output.csv'
+# the sensor description is used here instead of the ID.
 SENSOR_GROUPINGS = {
 	"group1": [ "Hwy 21 at St Augustine Creek Level Sensor", "Houlihan Boat Ramp Sea Level Sensor", "Dean Forest Road at Harden Canal Sea Level Sensor", "Hwy 17 at Salt Creek Sea Level Sensor" ],
 	"group2": [ "Fort Pulaski (A) Sea Level Sensor", "Fort Pulaski (B) Sea Level Sensor", "Catalina Drive Sea Level Sensor", "Lazaretto Creek Fishing Pier Sea Level Sensor", "Hwy 80 at Chimney Creek on Tybee Island Sea Level Sensor" ],

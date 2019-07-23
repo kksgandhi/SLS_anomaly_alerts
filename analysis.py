@@ -236,6 +236,10 @@ def full_sensor_test(sensor, **kwargs):
     """
     given a sensor (row of the sensors dataframe) runs a full test on it
     kwargs are passed on to the inner functions
+
+    NOTE: MANY ASPECTS OF THIS FUNCTION ASSUME YOU ARE RUNNING THESE TESTS: ONE HOUR, ONE DAY, THREE DAYS. AT THIS POINT THESE TESTS ARE PRACTICALLY HARDCODED IN. I SUGGEST WRITING YOUR OWN VERSION OF full_sensor_test TO BREAK THIS HARDCODING
+
+    NOTE: KWARGS ARE PASSED TO OTHER FUNCTIONS (SUCH AS date). SEE THE OTHER FUNCTIONS FOR EXAMPLES OF KWARGS THAT CAN BE PASSED TO THIS FUNCTION
     returns:
         train_residuals (error from fitting the ftp curve on the training data)
         test_res_all (3 values, residuals from the 1 hour test,
