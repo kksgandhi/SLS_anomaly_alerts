@@ -36,14 +36,14 @@ def get_train(sensor, **kwargs):
         date (str): date to get train data from (will be offset by testing periods)
             default: today
         train_delta (float): # of days of training data to get
-            default: 7 days
+            default: config
         test_delta_array (list of floats): test deltas to use when choosing a training offset
             default: [1]
     """
     date = (date_parser.parse(kwargs["date"])
             if "date" in kwargs
             else datetime.datetime.utcnow())
-    train_delta  = kwargs.get("train_delta", 7) 
+    train_delta  = kwargs.get("train_delta", conf.TRAIN_DELTA) 
     n_days_train = datetime.timedelta(days=train_delta)
     max_test_offset = datetime.timedelta(days=max(kwargs.get("test_delta_array", [1])))
 
