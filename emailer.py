@@ -31,7 +31,13 @@ def daily_mail(send=True):
         print(params)
 
 def get_all_pngs():
-    return list(filter(lambda x: '.png' in x, os.listdir('./images/')))
+    try:
+        return list(
+               map(lambda x: "./images/" + x,
+               filter(lambda x: '.png' in x,
+               os.listdir('./images/'))))
+    except FileNotFoundError:
+        return []
 
 def list_anomalous_sensors():
     """
