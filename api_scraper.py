@@ -11,6 +11,7 @@ import os
 import datetime
 import binary_search as bs
 import re
+from dateutil.tz import tzutc
 
 base_url_sls  = 'https://api.sealevelsensors.org/v1.0/Things'
 base_url_noaa = 'https://tidesandcurrents.noaa.gov/api/datagetter'
@@ -88,12 +89,12 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
     # the file name is quite absurd, but unique
     file_name = './' + cache_folder + '/' + "".join(re.split("[^a-zA-Z0-9]*", link)) + '.json'
     today = str(datetime.datetime.utcnow())
-    utcparse = lambda x: date_parser.parse(x).replace(tzinfo=datetime.timezone.utc)
+    utcparse = lambda x: date_parser.parse(x).replace(tzinfo=tzutc())
     parsed_start_date = (utcparse(start_date)
-                        if start_date 
+                        if start_date
                         else date_parser.parse(DEFAULT_START_DATE))
     parsed_end_date = (utcparse(end_date)
-                       if end_date 
+                       if end_date
                        else datetime.datetime.now(datetime.timezone.utc))
     # whether or not to write out a new cache
     do_update = True
