@@ -116,6 +116,8 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
                 # load and parse all the observations
                 observations = list(map(lambda x: (x[0], utcparse(x[1])), json.load(cache_file)))
                 # the last cached observation
+                if len(observations) < 1: 
+                	raise FileNotFoundError 
                 end_observations = observations[-1][1]
                 if parsed_end_date > end_observations:
                     """
