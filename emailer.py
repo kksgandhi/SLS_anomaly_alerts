@@ -63,4 +63,4 @@ def list_anomalous_sensors():
 
 ##
 if __name__ == "__main__":
-    send_daily()
+    daily_mail()
