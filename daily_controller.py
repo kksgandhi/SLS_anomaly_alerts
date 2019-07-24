@@ -18,6 +18,7 @@ def daily_everything():
     # clear all pictures from the previous day
     list(map(os.remove, emailer.get_all_pngs()))
     # run daily analysis and put it in a csv
+    print("beginning analysis")
     daily_data = analysis.daily_test()
     daily_data.to_csv(conf.CSV_OUTFILE)
     # send daily email
