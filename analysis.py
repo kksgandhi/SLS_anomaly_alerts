@@ -11,6 +11,7 @@ from pprint import pprint as print
 from scipy.interpolate import interp1d
 import api_scraper as scraper
 import config as conf
+import sys
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
@@ -301,6 +302,7 @@ def full_sensor_test(sensor, **kwargs):
             plot(test_all[2], params, ftp_function,
                  plot_name=sensor_name, **kwargs)
         print("Success: " + sensor_name)
+        sys.stdout.flush()
         return train_residuals, test_res_all, num_pts_day, flags
     except Exception as e:
         if kwargs.get("verbose"):
@@ -313,6 +315,7 @@ def daily_test():
     downloads every sensor and runs the full test on every one
     """
     api_data  = scraper.get_sensors_with_obs_type()
+    print("got sensors, beginning to run tests on each sensor")
     sensors   = pd.DataFrame(api_data)
     out = sensors.apply(full_sensor_test, axis=1, test_delta_array = [1/24, 1, 3], save_plots=True)
     # break apart the output and save it in the dataframe
