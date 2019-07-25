@@ -21,7 +21,13 @@ def daily_everything():
     daily_data = analysis.daily_test()
     daily_data.to_csv(conf.CSV_OUTFILE)
     # send daily email
-    emailer.daily_mail()
+    try:
+        emailer.daily_mail()
+    except Exception as e:
+        print("================================")
+        print("Unable to send daily email alert")
+        print(str(e))
+        print("================================")
 
 
 if __name__ == "__main__":
