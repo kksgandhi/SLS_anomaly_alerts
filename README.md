@@ -4,14 +4,22 @@ If you are reading this, you hopefully know about the [sea level sensors project
 
 The purpose of our project was to create a programatic way to flag "interesting events". These events include both issues with the sensor and weather related issues. While our algorithm flags these events, it leaves it up to the user to determine what kind of events they are and what action should be taken.
 ## Usage
-This project has two end products: An email alert system and a website. Since there is a lot of code overlap, both these projects are in the same git repository (although they can be ran semi-individually if preferred).
+This project has two end products: An email alert system and a website. Both are coupled and ran together (although they can be ran semi-individually if preferred).
 ### Email alerts
-If you run daily_controller.py it will perform a variety of analysis on each of the sensors, save the data, and then send an email to the recipients in private_config.py detailing interesting sensors. This file is intended to be run daily.
+If you run daily_controller.py it will perform a variety of analysis on each of the sensors, save the data, and then send an email to the recipients in private_config.py detailing interesting sensors. This file is intended to be run daily. (and will be automatically by the gunicorn server)
 ### Website
-run website.py to show our interactive data visualization website. A server like gunicorn can be used with the included config (TODO) if the website is intended to be displayed public facing. 
+run website.py to show our interactive data visualization website. A server like gunicorn can be used with the included config if the website is intended to be displayed public facing. 
 
-**NOTE: The website has a feature that highlights anomalous sensors. This feature will not work if daily_controller.py is not run every night**
-## For developers
+**NOTE: The website has a feature that highlights anomalous sensors. This feature will not work if daily_controller.py is not run every night. The gunicorn config includes code to do this automatically**
+## Docker
+this project has an included Dockerfile. Docker is the intended way to use this project. Copy private_config_example.py to private_config.py and fill it out. Then install docker and run
+```
+sudo docker build --tag=anomalyserver .
+sudo docker run -p 80:8000 anomalyserver
+```
+(-p binds your computers port 80 to the gunicorn server's port 8000)
+Optional: If you follow the above instructions you will build a image which will then build its own cache. This can take a long time, which can be irritating if you keep making small changes and then having to rebuild. You can instead pre-build a cache by running daily_controller.py and then building your docker image. Then, small code changes can be rebuilt without needing to wait an hour each time
+## For future developers
 ### api_scraper.py
 This file contains a variety of methods that make using the api easier. Useful to probably any developer
 ### config.py
