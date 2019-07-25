@@ -31,6 +31,7 @@ def daily_mail(send=True):
         print(params)
 
 def get_all_pngs():
+    """gets the name of every png in the 'images' folder"""
     try:
         return list(
                map(lambda x: "./images/" + x,
@@ -40,9 +41,7 @@ def get_all_pngs():
         return []
 
 def list_anomalous_sensors():
-    """
-    creates email text discussing which sensors are flagged
-    """
+    """creates email text discussing which sensors are flagged"""
     sensors = pd.read_csv(conf.CSV_OUTFILE)
     sens_1_hour  = sensors[sensors["flag_1hour"]]
     sens_1_day   = sensors[sensors["flag_1day"]]
