@@ -179,7 +179,7 @@ async function main(){
         .attr("text-anchor", "start")
         .style("font", "12px sans-serif")
         .style('font-weight', 'bold')
-        .text('Water Depth'))
+        .text('Water Level'))
 
     svg.append('g')
       .call(yAxis);
@@ -603,7 +603,7 @@ async function main(){
         .attr("text-anchor", "start")
         .style("font", "12px sans-serif")
         .style('font-weight', 'bold')
-        .text('Water Depth'))
+        .text('Water Level'))
 
     svg2.append('g')
       .call(yAxis2);
@@ -1019,32 +1019,38 @@ async function main(){
     get which summary statistic is selected and plot the according value
     */
 
+    var checkedSensorsM = {};
     function updateChecks() {
-      checkedSensorsM = []
-      checkedSensorsS = []
+      var newlycheckedSensorsM = {};
+      console.log("-----")
+      var checkedSensorsS = new Set();
       for (var i = 0; i < longNames.length; i++) {
         var isChecked = document.getElementById(longNames[i]).checked;
         if (isChecked) {
-          checkedSensorsM.push(longnames2data[longNames[i]])
-          checkedSensorsS.push(statsname2data[longNames[i]])
+          newlycheckedSensorsM[i] = longnames2data[longNames[i]]
+          checkedSensorsS.add(statsname2data[longNames[i]])
 
         }
       }
 
       // update the raw data plot
-      for (var i = 0; i < names.length; i++) {
-        svg.selectAll('.' + names[i])
+      for (let num in checkedSensorsM) {
+        if (!(num in newlycheckedSensorsM)) {
+          console.log(num + "to be removed")
+        svg.selectAll('.' + names[num])
           .remove()
+        }
       }
-
-      //console.log(checkedSensorsS)
-      //console.log(checkedSensorsM)
 
       var rawDomain = x.domain()
       var statsDomain = x2.domain()
 
-      checkedSensorsM.forEach(function(d) {
-
+      Object.keys(newlycheckedSensorsM).forEach(function(key) {
+        if (key in checkedSensorsM){
+          return;
+        }
+        console.log(key + "to be added");
+        d = newlycheckedSensorsM[key];
         dots.selectAll('dot')
           .data(d.pairs)
           .enter()
@@ -1052,8 +1058,6 @@ async function main(){
           .attr("class", function(d) {
             return 'dot ' + d.pin
           })
-          //.attr("cx", d => cx(d) )
-          //.attr("cy", d => cy(d))
           .attr("cx", function(d) {
             if (d.x < rawDomain[1] && d.x > rawDomain[0]) {
               return cx(d)
@@ -1075,6 +1079,8 @@ async function main(){
           .on("mouseover", handleMouseOver)
           .on("mouseleave", doNotHighlight)
       });
+
+      checkedSensorsM = newlycheckedSensorsM;
 
       // update the statistics plot
 
