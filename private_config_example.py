@@ -1,4 +1,5 @@
 # sender email username
+# make sure this email trusts less secure apps
 USERNAME=""
 # sender email password
 PASSWORD=""
