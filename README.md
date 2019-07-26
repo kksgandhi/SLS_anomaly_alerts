@@ -19,9 +19,9 @@ It is highly recommended to give this website as many cores as possible (the spe
 this project has an included Dockerfile. Docker is the intended way to use this project. Copy private_config_example.py to private_config.py and fill it out. Then install docker and run
 ```
 sudo docker build --tag=anomalyserver .
-sudo docker run -p 80:8000 anomalyserver
+sudo docker run -p 8000:8000 anomalyserver
 ```
-(-p binds your computers port 80 to the gunicorn server's port 8000)
+(-p binds your computers port 8000 to the gunicorn server's port 8000)
 
 Optional: If you follow the above instructions you will build a image which will then build its own cache. This can take a long time, which can be irritating if you keep making small changes and then having to rebuild. You can instead pre-build a cache by running daily_controller.py and then building your docker image. Then, small code changes can be rebuilt without needing to wait an hour each time
 ## For future developers
