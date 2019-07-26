@@ -20,5 +20,5 @@ def on_starting(server):
         daily_everything()
     print("Cache building complete")
     scheduler = BackgroundScheduler()
-    scheduler.add_job(daily_everything, 'cron', hour='6')
+    scheduler.add_job(daily_everything, 'cron', hour='6', jitter='1000')
     scheduler.start()
