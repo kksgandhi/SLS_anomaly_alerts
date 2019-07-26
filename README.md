@@ -3,6 +3,8 @@
 If you are reading this, you hopefully know about the [sea level sensors project](https://www.sealevelsensors.org/). At the time of this writing, the sls project was just beginning to get good data, but there were some sensors that were still causing issue. In addition, there was no real way to know if anything "interesting" was going on with the water levels aside from clicking through each sensor individually and examining it visually.
 
 The purpose of our project was to create a programatic way to flag "interesting events". These events include both issues with the sensor and weather related issues. While our algorithm flags these events, it leaves it up to the user to determine what kind of events they are and what action should be taken.
+
+[Model explanation](https://docs.google.com/document/d/19SrmgpOm4aGNnZ0fbpc6kFA3_RETxNzuNxykFA1-SjU/edit?usp=sharing)
 ## Usage
 This project has two end products: An email alert system and a website. Both are coupled and ran together (although they can be ran semi-individually if preferred).
 ### Email alerts
@@ -18,6 +20,7 @@ sudo docker build --tag=anomalyserver .
 sudo docker run -p 80:8000 anomalyserver
 ```
 (-p binds your computers port 80 to the gunicorn server's port 8000)
+
 Optional: If you follow the above instructions you will build a image which will then build its own cache. This can take a long time, which can be irritating if you keep making small changes and then having to rebuild. You can instead pre-build a cache by running daily_controller.py and then building your docker image. Then, small code changes can be rebuilt without needing to wait an hour each time
 ## For future developers
 ### api_scraper.py
