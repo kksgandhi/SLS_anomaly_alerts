@@ -13,8 +13,8 @@ import binary_search as bs
 import re
 from dateutil.tz import tzutc
 
-base_url_sls  = 'https://api.sealevelsensors.org/v1.0/Things'
-base_url_noaa = 'https://tidesandcurrents.noaa.gov/api/datagetter'
+base_url_sls       = 'https://api.sealevelsensors.org/v1.0/Things'
+base_url_noaa      = 'https://tidesandcurrents.noaa.gov/api/datagetter'
 DEFAULT_START_DATE = 'April 1 2019'
 
 
@@ -46,6 +46,7 @@ def get_sensors_with_obs_type(type_name="Water Level"):
 
     Parameters:
         type_name (str): type of observation to get
+            default: 'Water Level'
     Returns:
         sensors (list): a list of 'sensors', each sensor being a dictionary
             with information on the sensor
@@ -97,8 +98,9 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
     observations = []
     # the file name is quite absurd, but hopefully unique
     file_name = './' + cache_folder + '/' + "".join(re.split("[^a-zA-Z0-9]*", link)) + '.json'
+    # just parsing some dates
     today = str(datetime.datetime.utcnow())
-    utcparse = lambda x: date_parser.parse(x).replace(tzinfo=tzutc())
+    def utcparse(x): return date_parser.parse(x).replace(tzinfo=tzutc())
     parsed_start_date = (utcparse(start_date)
                         if start_date
                         else date_parser.parse(DEFAULT_START_DATE))
@@ -115,9 +117,10 @@ def get_obs_for_link(link, start_date=None, end_date=None, reset_cache=False, ca
             with open(file_name) as cache_file:
                 # load and parse all the observations
                 observations = list(map(lambda x: (x[0], utcparse(x[1])), json.load(cache_file)))
-                # the last cached observation
+                # no observations? time to rebuild the cache
                 if len(observations) < 1: 
                 	raise FileNotFoundError 
+                # the last cached observation
                 end_observations = observations[-1][1]
                 if parsed_end_date > end_observations:
                     """
