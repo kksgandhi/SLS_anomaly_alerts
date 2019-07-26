@@ -12,6 +12,8 @@ If you run daily_controller.py it will perform a variety of analysis on each of 
 ### Website
 run website.py to show our interactive data visualization website. A server like gunicorn can be used with the included config if the website is intended to be displayed public facing. 
 
+It is highly recommended to give this website as many cores as possible (the speed of these cores does not matter)
+
 **NOTE: The website has a feature that highlights anomalous sensors. This feature will not work if daily_controller.py is not run every night. The gunicorn config includes code to do this automatically**
 ## Docker
 this project has an included Dockerfile. Docker is the intended way to use this project. Copy private_config_example.py to private_config.py and fill it out. Then install docker and run
