@@ -29,9 +29,28 @@ def get_daily_csv():
         return jsonify(list(reader))
 
 
+@app.route("/irma")
+def get_irma():
+    with open("./irma.csv", "r") as f:
+        reader = csv.DictReader(f)
+        return jsonify(list(reader))
+
+
+@app.route("/matthew")
+def get_matthew():
+    with open("./matthew.csv", "r") as f:
+        reader = csv.DictReader(f)
+        return jsonify(list(reader))
+
+
 @app.route("/sensor_groupings")
 def get_sensor_groupings():
     return jsonify(conf.SENSOR_GROUPINGS)
+
+
+@app.route("/hurricane_info")
+def hurricane_info():
+    return render_template("hurricane.html")
 
 
 if __name__ == "__main__":
