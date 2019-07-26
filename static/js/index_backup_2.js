@@ -50,15 +50,23 @@ async function main(){
     var promices = [];
 
 
-    start_date = "June 1 2019";
+    monthAgo = new Date (new Date() - 31 * 1000 * 60 * 60 * 24);
+    
     test_date = new Date();
-    var yyyy = (test_date.getYear() + 1900).toString();
-    var mm = (test_date.getMonth() + 1).toString();
-    var dd = (test_date.getDate()).toString();
-    var hh = (test_date.getHours()).toString();
-    var min = (test_date.getMinutes()).toString();
-    test_date = yyyy + " " + mm + " " + dd + " " + hh + ":" + min
-    end_date = test_date;
+    
+    function makeDate(test_date){ 
+		var yyyy = (test_date.getYear() + 1900).toString();
+		var mm = (test_date.getMonth() + 1).toString();
+		var dd = (test_date.getDate()).toString();
+		var hh = (test_date.getHours()).toString();
+		var min = (test_date.getMinutes()).toString();
+		test_date = yyyy + " " + mm + " " + dd + " " + hh + ":" + min
+		return test_date 
+    } 
+    
+    end_date = makeDate(test_date);
+    start_date = makeDate(monthAgo); 
+    
     console.log(start_date)
     console.log(end_date)
 
