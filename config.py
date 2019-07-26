@@ -26,5 +26,5 @@ SENSOR_GROUPINGS = {
 	"group7": ["Landings Harbor Marina Sea Level Sensor","SKIO Dock Sea Level Sensor", "Turner Creek Boat Ramp Sea Level Sensor", "Walthour Road environmental sensors", "Bull River Marina environmental sensors" ]
 }
 # Number of days to train the model on.
-# More days are better, but more affected by bad data. 
+# More days are better, but more affected by bad data.
 TRAIN_DELTA = 7
