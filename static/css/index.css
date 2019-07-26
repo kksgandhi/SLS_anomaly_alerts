@@ -112,3 +112,16 @@ for search bar
   border: none;
   cursor: pointer;
 }
+
+.x-axis line{
+ stroke: light-gray;
+ opacity: 0.3;
+}
+.x-axis2 line{
+ stroke: light-gray;
+ opacity: 0.3;
+}
+.y-axis line {
+    stroke: light-gray;
+    opacity: 0.3;
+}

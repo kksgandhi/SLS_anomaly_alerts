@@ -146,7 +146,7 @@ async function main(){
       .domain([startTime, overallMaxT]) // start zoomed in on a smaller window
       .range([margin.left, width - margin.right]);
 
-    var xAxis = d3.axisBottom().scale(x).ticks(width / 80).tickSizeOuter(0)
+    var xAxis = d3.axisBottom().scale(x).ticks(width / 80).tickSize(-height)
 
     svg.append('g')
       .attr("class", "x-axis")
@@ -172,8 +172,9 @@ async function main(){
       .range([height - margin.bottom, margin.top])
 
     var yAxis = g => g
+      .attr('class', 'y-axis')
       .attr('transform', 'translate(' + (margin.left).toString() + ',0)')
-      .call(d3.axisLeft(y))
+      .call(d3.axisLeft(y).ticks(height / 80).tickSize(-width+margin.left+margin.right))
       .call(g => g.select(".domain").remove())
       .call(g => g.select(".tick:last-of-type text").clone()
         .attr("text-anchor", "start")
@@ -193,7 +194,7 @@ async function main(){
 
     var label = svg.append('g')
       .attr("class", "label")
-      .attr('transform', 'translate(' + (width - margin.right - 60).toString() + ',' + (height - margin.bottom - 20).toString() + ')')
+      .attr('transform', 'translate(' + (width - margin.right - 200).toString() + ',' + (height - margin.bottom - 40).toString() + ')')
 
     label.append("text")
       .attr("class", "label")
@@ -570,7 +571,7 @@ async function main(){
       .domain([overallMinT2, overallMaxT2])
       .range([margin.left, width - margin.right]);
 
-    var xAxis2 = d3.axisBottom().scale(x2).ticks(width / 80).tickSizeOuter(0)
+    var xAxis2 = d3.axisBottom().scale(x2).ticks(width / 80).tickSize(-height)
 
     svg2.append('g')
       .attr("class", "x-axis2")
@@ -596,8 +597,10 @@ async function main(){
       .range([height - margin.bottom, margin.top])
 
     var yAxis2 = g => g
+      .attr('class', 'y-axis')
+
       .attr('transform', 'translate(' + (margin.left).toString() + ',0)')
-      .call(d3.axisLeft(y2))
+      .call(d3.axisLeft(y2).ticks(height / 80).tickSize(-width+margin.left+margin.right))
       .call(g => g.select(".domain").remove())
       .call(g => g.select(".tick:last-of-type text").clone()
         .attr("text-anchor", "start")
