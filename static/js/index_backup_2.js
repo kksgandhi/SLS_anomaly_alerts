@@ -22,18 +22,18 @@ async function main(){
 
   $.get("/get_sensors_with_obs_type", async function(api_data){
 
-    var dict = []
-    var names = []
+    var dict      = []
+    var names     = []
     var longNames = []
-    var levels = []
-    var times = []
+    var levels    = []
+    var times     = []
 
 
-    var sum_data = {}
-    var sum_times = []
+    var sum_data   = {}
+    var sum_times  = []
     var sum_levels = []
 
-    var i=0;
+    var i        = 0;
     var promices = [];
 
 
@@ -104,9 +104,7 @@ async function main(){
     dict = prune
 
     // access all the data for a certain sensor based on its name
-    var longnames2data = {
-
-    }
+    var longnames2data = { } 
 
     for (var i = 0; i < longNames.length; i++) {
       longnames2data[longNames[i]] = dict[i]
