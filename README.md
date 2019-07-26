@@ -4,7 +4,7 @@ If you are reading this, you hopefully know about the [sea level sensors project
 
 The purpose of our project was to create a programatic way to flag "interesting events". These events include both issues with the sensor and weather related issues. While our algorithm flags these events, it leaves it up to the user to determine what kind of events they are and what action should be taken.
 
-[Model explanation](https://docs.google.com/document/d/19SrmgpOm4aGNnZ0fbpc6kFA3_RETxNzuNxykFA1-SjU/edit?usp=sharing)
+**[Model explanation](https://docs.google.com/document/d/19SrmgpOm4aGNnZ0fbpc6kFA3_RETxNzuNxykFA1-SjU/edit?usp=sharing)**
 ## Usage
 This project has two end products: An email alert system and a website. Both are coupled and ran together (although they can be ran semi-individually if preferred).
 ### Email alerts
