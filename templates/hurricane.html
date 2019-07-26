@@ -1,0 +1,318 @@
+
+<html>
+    <head>
+            <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+        <title>Hurricane Case Study</title>
+        
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+		integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+		crossorigin=""/>
+
+		<!-- loading leaflet -->
+		<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+		integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+		crossorigin=""></script>
+		
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+        
+	<style>
+		#wrapper {
+  			display: flex;
+		}
+		
+		#mapid {  width: 700px; height: 600px; flex: 0 0 45%; margin:20px 20px 20px 20px;}
+		#mapid2 {  width: 700px; height: 600px; flex: 0 0 45%; margin:20px 20px 20px 20px;}
+
+	</style> 
+	   
+    </head>
+    <body>
+        
+        <div>
+			<h1> Sea Level Sensors Project Motivation: Hurricane Case Study  </h1>
+		</div> 
+		        
+        <div id="wrapper"> 
+    
+			<div id="mapid"></div>
+
+
+			<div id="mapid2"></div>
+
+			<svg></svg>
+        
+        </div>
+        
+        <p1> In 2016 and 2017, the eastern seaboard was hit with Hurricanes Matthew and Irma. Both hurricanes were classified as category 5.
+        Before the storms reached land, the United States Geological Survey (USGS) deployed temporary water level sensors throughout Chatham county to monitor water levels during the storms. 
+        In addition, there is a permanent sensor provided by the National Oceanic and Atmospheric Administration (NOAA) at Ft. Pulaski. During the two hurricanes this tide gauge read similar peak water levels.   
+        However, the hurricanes affected Chatham country in vastly different ways despite the similar readings at Fort. Pulaski. </p1>
+        
+        <p2> 
+        In order to illustrate these nuances, we created this visualization where the peak water level recorded at each temporary sensor is compared to the reading at Ft. Pulaski. 
+        The black circle represents the location of Ft. Pulaksi and the colored triangles indicate the temporary sensor locations. The blue downward facing triangles represent locations where flooding was lower than flooding at Ft. Pulaski. 
+        The red upward facing triangles represent locations where the flooding was greater than the flooding at Ft. Pulaski. 
+        The size of the triangle corresponds to the magnitudes of the difference. These events were used as a prime example to show that a single sensor at Ft. 
+        Pulaski is not enough to capture the intricacies of flooding events in Chatham county. 
+        The use of this data helped open the door to the installation of a permanent sensor network. </p2>
+        
+        <div>
+        <a href="https://www.sealevelsensors.org/">The SLS project</a>
+        </div>
+        <script> 
+        	
+        	/*
+        	create map for Hurricane Matthew data 
+        	set view centered on Savannah 
+        	*/ 
+        	
+        	var mMap = L.map('mapid').setView([32.00807596, -81.01524353], 11);
+
+			L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			maxZoom: 18,
+			id: 'mapbox.streets',
+			accessToken: 'pk.eyJ1IjoibWNhcmxpbmk2IiwiYSI6ImNqd2h3ZW93cDAxaWo0M3A5bHFsb2l0NXIifQ.qiehHoOFMMN0VTrTg3_nDQ'
+			}).addTo(mMap);
+			
+			/*
+        	create map for Hurricane Matthew data 
+        	set view centered on Savannah 
+        	*/  
+			
+			var iMap = L.map('mapid2').setView([32.00807596, -81.01524353], 11);
+
+			L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			maxZoom: 18,
+			id: 'mapbox.streets',
+			accessToken: 'pk.eyJ1IjoibWNhcmxpbmk2IiwiYSI6ImNqd2h3ZW93cDAxaWo0M3A5bHFsb2l0NXIifQ.qiehHoOFMMN0VTrTg3_nDQ'
+			}).addTo(iMap);
+			
+			/* 
+			functions that are shared between both plots
+			*/ 
+			
+			function pickColor(boo){ 
+				/* 
+				takes in a boolean value that indicates if the flooding at that sensor was higher or lower than flooding at Ft. Pulaski 
+				determine the color to represent each sensor 
+				return either blue or red 
+				*/ 
+				if (boo==1){ 
+					return 'red'
+				}
+				else{ 
+					return 'blue'
+				}
+			}
+			
+			function normalize(d, vals) { 
+				/* 
+				takes in the difference (d) between sensor and Ft. Pulaski peak flooding 
+				takes in a list of all the difference values (vals)
+				normalize a value to a 0-1 scale using the maximum and minimum 
+				*/ 
+				var max = d3.max(vals); 
+				var min = d3.min(vals);
+				var range = max-min; 
+									
+				return (d-min)/range; 		
+			}
+			
+			function makeTriangle(loc, isAbove, normed) { 
+				/* 
+				takes in loc array ([lat, long])
+				takes in above/below boolean (isAbove)
+				takes in normalized water level difference value (normed)
+				calculate the coordinates for polygon triangle object 
+				use the isAbove boolean to determine if the triangel should point up or down 
+				scale the size of the triangle based on the normalized flood difference level 
+				*/ 
+				var latlngs = []
+				if (isAbove==1) { 
+					latlngs = [ [ loc[0] , loc[1]+(0.01*normed+0.01) ]  , [loc[0] , loc[1]-(0.01*normed+0.01) ] , [loc[0]+(0.01*normed+0.01) , loc[1] ] ];
+					} 
+				else { 
+					latlngs = [ [ loc[0] , loc[1]+(0.01*normed+0.01) ]  , [loc[0] , loc[1]-(0.01*normed+0.01) ] , [loc[0] -(0.01*normed+0.01) , loc[1] ] ];
+					}
+				return latlngs; 
+			}
+				
+			/* 
+			begin Matthew plot 
+			create matthew_data array to store the data, the triangle/data pairs, 
+			and the value of the difference between Ft. Pulaski and sensor peak flooding 
+			*/ 
+			
+			var matthew_data = [] 
+			var objects = []
+			var values = []	
+			
+			$.get("/matthew", function(data) {
+			 	/* 
+			 	read in data from csv file and store certain fields
+			 	all computations  done within csv file loop so that async does not cause errors 
+			 	*/ 
+			 	data.forEach(function(d){ 
+					matthew_data.push(  
+						{'latitude_dd' : +d.latitude_dd, 
+						'longitide_dd' : +d.longitude_dd, 
+						'difference' : +d.difference,
+						'peak_stage' : +d.peak_stage, 
+						'isAbove' : +d.isAbove, 
+						'description': d.description, 
+						'site_id': d.site_id } 
+						) 
+					values.push(+d.difference)				
+				});
+
+				matthew_data.forEach(function(d) { 
+					/* 
+					draw a triangle on the plot for each sensor 
+					draw a black circle to represent Ft. Pulaski 
+					store the triangle object and the corresponding data in the objects array 
+					*/ 
+					if (d.site_id == '17824'){ 
+					
+						var circle = L.circle( [ d.latitude_dd, d.longitide_dd] , {
+							color: 'black',
+							fillColor: 'black', 
+							fillOpacity: 1,
+							radius: 400
+						})  ;
+						circle.addTo(mMap)
+						objects.push([circle, d]) 
+					}
+					else { 
+						var tri = L.polygon(makeTriangle([d.latitude_dd, d.longitide_dd], d.isAbove, normalize(d.difference , values)), {color: pickColor(d.isAbove)})
+						tri.addTo(mMap)
+						objects.push([tri, d]) 
+					} 
+				}); 
+				
+				objects.forEach(function(obj) { 
+					/* 
+					add mouseover interactivity to each triangle 
+					pass the data associated with each triangle to the update function for the mouseover event 
+					*/ 
+					obj[0].on('mouseover', function (e) {
+						info.update(obj[1]);
+					});
+					obj[0].on('mouseout', function (e) {
+						info.update();
+					});
+				
+				}); 	
+				
+				// create an info div in the DOM 
+				var info = L.control(); 
+
+				info.onAdd = function (mMap) {
+					this._div = L.DomUtil.create('div', 'info'); 
+					this.update();
+					return this._div;
+				};
+ 
+				info.update = function (sen) {
+					/* 
+					display the key when there is no mouseover event 
+					show the Ft. Pulaski peak water level along with the peak water level for the hovered sensor 
+					*/ 
+					this._div.innerHTML = '<h4>Hurricane Matthew Water Level Sensors</h4>' +  (sen ?
+						'Fort. Pulaski: 9.12 ft' + '<br>'+ sen.description+ ': ' +sen.peak_stage+' ft </br>'
+						: '<p4>&#9651</p4>'+' : flooding greater than Ft. Pulaski<br><p5>&#9661</p5>'+' : flooding less than Ft. Pulaski<br> Size: magnitude of difference from Ft. Pulaski reading');  
+				}; 
+				info.addTo(mMap);
+			}); 
+			
+			/* 
+			begin Irma plot 
+			create irma_data array to store the data, the triangle/data pairs, 
+			and the value of the difference between Ft. Pulaski and sensor peak flooding 
+			*/ 
+			
+			var irma_data = [] 
+			var i_objects = []
+			var i_values = []
+			
+			$.get("/irma", function(data) {
+			 	/* 
+			 	read in data from csv file and store certain fields
+			 	all computations done within csv file loop so that async does not cause errors 
+			 	*/ 
+			 	data.forEach(function(d){ 
+					irma_data.push(  
+						{'latitude_dd' : +d.latitude_dd, 
+						'longitide_dd' : +d.longitude_dd, 
+						'difference' : +d.difference,
+						'peak_stage' : +d.peak_stage, 
+						'isAbove' : +d.isAbove, 
+						'description': d.description, 
+						'site_id': d.site_id } 
+						) 
+					i_values.push(+d.difference)
+				});
+				
+				irma_data.forEach(function(dt) { 
+					/* 
+					draw a triangle on the plot for each sensor 
+					draw a black circle to represent Ft. Pulaski 
+					store the triangle object and the corresponding data in the objects array 
+					*/ 
+					if (dt.site_id == '17824'){ 
+					
+						var circle = L.circle( [ dt.latitude_dd, dt.longitide_dd] , {
+							color: 'black',
+							fillColor: 'black', 
+							fillOpacity: 1,
+							radius: 400
+						})  ;
+						circle.addTo(iMap)
+						i_objects.push([circle, dt]) 
+					}
+					else { 
+						var tri = L.polygon(makeTriangle([dt.latitude_dd, dt.longitide_dd], dt.isAbove, normalize(dt.difference, i_values)), {color: pickColor(dt.isAbove)})
+						tri.addTo(iMap)
+						i_objects.push([tri, dt]) 
+					} 
+				}); 
+				
+				i_objects.forEach(function(obj) { 
+					/* 
+					add mouseover interactivity to each triangle 
+					pass the data associated with each triangle to the update function for the mouseover event 
+					*/ 
+					obj[0].on('mouseover', function (e) {
+						info.update(obj[1]);
+					});
+					obj[0].on('mouseout', function (e) {
+						info.update();
+					});
+				}); 	
+				
+				// create an info div in the DOM 
+				var info = L.control(); 
+
+				info.onAdd = function (iMap) {
+					this._div = L.DomUtil.create('div', 'info'); 
+					this.update();
+					return this._div;
+				};
+ 
+				info.update = function (sen) {
+					/* 
+					display the key when there is no mouseover event 
+					show the Ft. Pulaski peak water level along with the peak water level for the hovered sensor 
+					*/ 
+					this._div.innerHTML = '<h4>Hurricane Irma Water Level Sensors</h4>' +  (sen ?
+						'Fort. Pulaski: 8.53 ft' + '<br>'+ sen.description+ ': ' +sen.peak_stage+' ft </br>'
+						: '<p4>&#9651</p4>'+' : flooding greater than Ft. Pulaski<br><p5>&#9661</p5>'+' : flooding less than Ft. Pulaski<br> Size: magnitude of difference from Ft. Pulaski reading');  
+				};  
+				info.addTo(iMap);
+			});
+			
+        </script>
+    </body>
+</html>  
