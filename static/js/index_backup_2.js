@@ -70,7 +70,6 @@ async function main(){
     console.log(start_date)
     console.log(end_date)
 
-
     for(sensor of api_data){
       dict.push({
         'name': sensor.desc,
@@ -211,7 +210,18 @@ async function main(){
       .attr("text-anchor", "middle");
 
     label.select("text").text('');
+    
+    var labelD = svg.append('g')
+      .attr("class", "label")
+      .attr('transform', 'translate(' + (width - margin.right - 200).toString() + ',' + (height - margin.bottom - 20).toString() + ')')
 
+    labelD.append("text")
+      .attr("class", "label")
+      .style("font", "12px sans-serif")
+      .style('font-weight', 'bold')
+      .attr("text-anchor", "middle");
+
+    labelD.select("text").text('');
 
     /*
       	allow hovering over each sensor
@@ -231,6 +241,7 @@ async function main(){
         .attr("fill-opacity", "1")
 
       label.select("text").text(data1[0].des);
+      labelD.select('text').text(data1[0].y.toFixed(2) + 'm , ' + data1[0].x)
 
     }
 
@@ -240,6 +251,7 @@ async function main(){
         .attr("fill-opacity", "1")
 
       label.select("text").text('');
+      labelD.select("text").text('');
 
     }
 
@@ -647,9 +659,9 @@ async function main(){
 
     // put a text label with the current sensor
 
-    var label2 = svg2.append('g')
+	 var label2 = svg2.append('g')
       .attr("class", "label")
-      .attr('transform', 'translate(' + (width - margin.right - 60).toString() + ',' + (height - margin.bottom - 20).toString() + ')')
+      .attr('transform', 'translate(' + (width - margin.right - 200).toString() + ',' + (height - margin.bottom - 40).toString() + ')')
 
     label2.append("text")
       .attr("class", "label")
@@ -658,7 +670,18 @@ async function main(){
       .attr("text-anchor", "middle");
 
     label2.select("text").text('');
+    
+    var labelD2 = svg2.append('g')
+      .attr("class", "label")
+      .attr('transform', 'translate(' + (width - margin.right - 200).toString() + ',' + (height - margin.bottom - 20).toString() + ')')
 
+    labelD2.append("text")
+      .attr("class", "label")
+      .style("font", "12px sans-serif")
+      .style('font-weight', 'bold')
+      .attr("text-anchor", "middle");
+
+    labelD2.select("text").text('');
 
     // Highlight the sensor that is hovered
     function handleMouseOver2(d) {
@@ -672,7 +695,12 @@ async function main(){
         .raise()
         .style("opacity", 1.0);
 
-      label2.select("text").text(data2[0].des);
+        values = Object.values(data2[0]) 
+		
+        console.log(values)
+		
+      	label2.select("text").text(data2[0].des);
+      	labelD2.select('text').text(values[1].toFixed(2) + 'm , ' + data2[0].date)
 
     }
 
@@ -681,6 +709,7 @@ async function main(){
         .style("opacity", 1)
 
       label2.select("text").text('');
+      labelD2.select("text").text('');
 
     }
 
