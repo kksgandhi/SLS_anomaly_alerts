@@ -231,15 +231,22 @@ async function main(){
 
     function handleMouseOver(d) {
 
+      /**
+        This code causes the hovered sensor
+        to be highlighted (and all other sensors to be un-highlighted)
+        it can be slow, which is why it is currently commented
       svg.selectAll('.dot')
         .attr("fill-opacity", "0.01")
+        */
 
       let data1 = d3.select(this).data()
 
+      /**
       svg.selectAll('.' + data1[0].pin)
         .raise()
         .attr("fill-opacity", "1")
 
+      */
       label.select("text").text(data1[0].des);
       labelD.select('text').text(data1[0].y.toFixed(2) + 'm , ' + data1[0].x)
 
