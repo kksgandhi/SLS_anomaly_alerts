@@ -1031,6 +1031,7 @@ async function main(){
     button.onclick = updateChecks;
     button.innerHTML = "Update Plots";
     button.setAttribute('class', 'options')
+    button.setAttribute('style', 'background-color: orange')
     myDropdown.appendChild(button)
 	
     for (var i = 0; i < longNames.length; i++) {
